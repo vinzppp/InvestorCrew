@@ -1,0 +1,55 @@
+{
+  "ticker": "JPM",
+  "name": "JPMorgan Chase",
+  "aliases": ["jpmorgan", "jpm", "jpmorgan chase"],
+  "is_public": true,
+  "is_tech": false,
+  "sector": "Financials",
+  "industry": "Diversified Banks",
+  "archetype": "bank",
+  "description": "JPMorgan is a diversified bank with consumer, corporate, wealth, and investment banking businesses backed by a large deposit franchise.",
+  "technology": {
+    "summary": "The company is not treated as a primary technology platform in the fixture set.",
+    "world_impact": "Its importance is more financial-system scale than standalone technology disruption.",
+    "feasibility": "Operationally mature.",
+    "requirements": ["Capital", "Regulatory compliance", "Funding"],
+    "constraints": ["Regulation", "Credit cycle exposure"],
+    "competitor_technologies": ["Digital banking platforms", "Payments infrastructure"],
+    "preferred_technology": "N/A",
+    "preferred_rationale": "Technology is not the primary investment lens here.",
+    "open_unknowns": []
+  },
+  "stock": {
+    "as_of": "2026-03-20",
+    "currency": "USD",
+    "price": 227.4,
+    "market_cap": 648000000000,
+    "enterprise_value": 0,
+    "segment_mix": {
+      "Consumer and Community Banking": 0.36,
+      "Corporate and Investment Bank": 0.32,
+      "Commercial Banking": 0.17,
+      "Asset and Wealth Management": 0.15
+    },
+    "operating_metrics": {
+      "roe_pct": 18.0,
+      "rotce_pct": 22.0,
+      "net_interest_margin_pct": 2.7,
+      "efficiency_ratio_pct": 52.0
+    },
+    "valuation_metrics": {
+      "trailing_pe": 13.4,
+      "forward_pe": 12.8,
+      "price_to_tangible_book": 2.1
+    },
+    "balance_sheet_metrics": {
+      "cet1_ratio_pct": 15.1,
+      "loan_loss_reserve_billion": 29.0,
+      "loan_to_deposit_ratio_pct": 52.0
+    },
+    "supplemental_metrics": {
+      "deposit_growth_pct": 4.0
+    },
+    "commentary": "High-quality franchise and strong returns, though the market already recognizes the strength."
+  }
+}

@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "investorcrew"
+version = "0.1.0"
+description = "Multi-agent investment and macro diligence CLI"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115.0,<1.0.0",
+    "httpx>=0.27.0,<1.0.0",
+    "uvicorn>=0.30.0,<1.0.0",
+]
+
+[project.scripts]
+investorcrew = "investorcrew.cli:main"
+
+[tool.setuptools]
+include-package-data = false
+
+[tool.setuptools.packages.find]
+include = ["investorcrew*"]

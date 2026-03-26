@@ -1,0 +1,73 @@
+{
+  "ticker": "OKLO",
+  "name": "Oklo Inc.",
+  "aliases": [
+    "oklo",
+    "oklo inc",
+    "oklo stock"
+  ],
+  "is_public": true,
+  "is_tech": true,
+  "sector": "Utilities",
+  "industry": "Utilities - Independent Power Producers",
+  "archetype": "developmental_energy_technology",
+  "description": "Oklo Inc. develops advanced fission power plants and fuel recycling technology aimed at delivering clean, reliable power for industrial sites and data-center-style loads.",
+  "technology": {
+    "summary": "Oklo is building advanced fission reactors and a fuel recycling strategy intended to supply compact, reliable nuclear power at customer sites.",
+    "world_impact": "If commercialized, the platform could offer firm low-carbon power for AI data centers, defense, and industrial facilities that need 24/7 energy.",
+    "feasibility": "Moderate. The technical vision is plausible, but licensing, reactor deployment, manufacturing scale, and execution timing remain major hurdles.",
+    "requirements": [
+      "Nuclear regulatory approvals",
+      "Project financing and customer commitments",
+      "Fuel-cycle and reactor manufacturing capability",
+      "Long-lead-site execution"
+    ],
+    "constraints": [
+      "Licensing and permitting timelines",
+      "Execution risk on first commercial reactor",
+      "Capital intensity before revenue scale",
+      "Potential shareholder dilution"
+    ],
+    "competitor_technologies": [
+      "NuScale light-water small modular reactors",
+      "TerraPower sodium-cooled reactors",
+      "Gas-fired generation for AI data centers",
+      "Large renewables plus storage portfolios"
+    ],
+    "preferred_technology": "Advanced fission reactors with high-capacity-factor onsite power",
+    "preferred_rationale": "The attraction is reliable carbon-free power for energy-hungry customers, but the thesis only works if licensing and deployment execution hold.",
+    "open_unknowns": [
+      "When the first commercial reactor actually reaches sustained operation",
+      "How much dilution is required before steady-state cash generation",
+      "Whether customer demand converts into durable, financeable projects"
+    ]
+  },
+  "stock": {
+    "as_of": "2026-01-21",
+    "currency": "USD",
+    "price": 90.78,
+    "market_cap": 14184000000,
+    "enterprise_value": 13130000000,
+    "segment_mix": {
+      "Advanced fission power plants": 1.0
+    },
+    "operating_metrics": {},
+    "valuation_metrics": {
+      "price_to_book": 11.66
+    },
+    "balance_sheet_metrics": {
+      "cash_billion": 0.9216,
+      "debt_to_equity_pct": 0.14
+    },
+    "supplemental_metrics": {
+      "levered_free_cash_flow_million": -40.52,
+      "return_on_equity_pct": -10.42,
+      "net_income_million": -76.56,
+      "first_revenue_expected_year": 2027,
+      "first_commercial_reactor_target_year": 2027,
+      "meta_power_campus_gw": 1.2,
+      "employees": 120
+    },
+    "commentary": "Yahoo Finance's 2026-01-21 page showed a 14.184B market cap, 11.66x price-to-book, and no TTM revenue. MarketWatch characterized Oklo as a pre-revenue nuclear company whose revenue is not expected until late 2027."
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "ticker": "NVDA",
+  "name": "NVIDIA",
+  "aliases": ["nvidia", "nvda"],
+  "is_public": true,
+  "is_tech": true,
+  "sector": "Technology",
+  "industry": "Semiconductors",
+  "archetype": "semiconductor_hardware",
+  "description": "NVIDIA designs GPU accelerators, networking hardware, and a software ecosystem that powers AI training and inference workloads.",
+  "technology": {
+    "summary": "A full-stack accelerated computing platform built around GPUs, networking, and CUDA software.",
+    "world_impact": "The platform can accelerate AI model training, simulation, robotics, and scientific workloads across the economy.",
+    "feasibility": "High. The stack is already deployed at scale, although supply chain capacity and power constraints remain meaningful.",
+    "requirements": ["Advanced packaging capacity", "Foundry access", "Developer ecosystem", "Large customer capex budgets"],
+    "constraints": ["Export controls", "Power consumption", "Hyperscaler custom silicon risk"],
+    "competitor_technologies": ["AMD GPU accelerators", "Hyperscaler custom ASICs", "Specialized inference chips"],
+    "preferred_technology": "NVIDIA's integrated accelerator platform",
+    "preferred_rationale": "The hardware-software ecosystem and installed developer base still provide the strongest edge.",
+    "open_unknowns": ["How durable hyperscaler AI capex stays through the next downcycle"]
+  },
+  "stock": {
+    "as_of": "2026-03-20",
+    "currency": "USD",
+    "price": 962.5,
+    "market_cap": 2360000000000,
+    "enterprise_value": 2385000000000,
+    "segment_mix": {
+      "Data Center": 0.82,
+      "Gaming": 0.12,
+      "Professional Visualization": 0.03,
+      "Automotive and OEM": 0.03
+    },
+    "operating_metrics": {
+      "revenue_growth_pct": 48.0,
+      "gross_margin_pct": 75.0,
+      "operating_margin_pct": 57.0,
+      "free_cash_flow_margin_pct": 39.0,
+      "inventory_days": 72,
+      "capex_intensity_pct": 4.2
+    },
+    "valuation_metrics": {
+      "trailing_pe": 54.0,
+      "forward_pe": 33.0,
+      "ev_to_sales": 20.1,
+      "ev_to_ebitda": 38.0,
+      "free_cash_flow_yield_pct": 2.2
+    },
+    "balance_sheet_metrics": {
+      "cash_and_investments_billion": 31.0,
+      "net_cash_billion": 20.0,
+      "current_ratio": 3.4
+    },
+    "supplemental_metrics": {
+      "backlog_coverage_quarters": 2.1
+    },
+    "commentary": "Exceptional growth and margins, but valuation already discounts a long runway of AI capex strength."
+  }
+}

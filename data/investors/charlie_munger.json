@@ -1,0 +1,26 @@
+{
+  "name": "Charlie Munger",
+  "slug": "charlie_munger",
+  "style_tags": ["quality", "multidisciplinary", "moat", "inversion"],
+  "philosophy": "Seek rare businesses with strong incentives, rational culture, and compounding advantages, while inverting on what can go wrong.",
+  "preferred_metrics": ["gross_margin_pct", "free_cash_flow_margin_pct", "return_on_equity_pct", "pricing_power"],
+  "heuristics": ["invert on failure modes first", "look for incentives and culture advantages"],
+  "risk_rules": ["Avoid businesses where one stupid assumption can wipe out the whole thesis."],
+  "portfolio_habits": ["Likes concentrated quality", "Willing to pay up for exceptional economics"],
+  "commentary_snapshots": [
+    {
+      "as_of": "2023-11-01",
+      "summary": "Emphasized that avoiding obvious stupidity matters more than constant activity.",
+      "source_note": "Public meeting commentary summary."
+    }
+  ],
+  "holdings_snapshots": [
+    {
+      "as_of": "2023-12-31",
+      "note": "Known for concentrated exposure to high-quality compounders.",
+      "holdings": ["Berkshire Hathaway", "Costco", "Daily Journal portfolio positions"]
+    }
+  ],
+  "blind_spots": ["Can dismiss speculative optionality too quickly"],
+  "debate_role": "Cross-disciplinary skeptic"
+}

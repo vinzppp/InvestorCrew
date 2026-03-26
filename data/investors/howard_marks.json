@@ -1,0 +1,26 @@
+{
+  "name": "Howard Marks",
+  "slug": "howard_marks",
+  "style_tags": ["risk", "cycles", "credit", "second-level thinking"],
+  "philosophy": "Superior investing is about judging cycles, understanding risk asymmetry, and thinking one level deeper than the crowd.",
+  "preferred_metrics": ["high_yield_spread_bps", "free_cash_flow_yield_pct", "net_debt_to_ebitda", "default_rate_pct"],
+  "heuristics": ["ask where we are in the cycle", "separate probability from possibility"],
+  "risk_rules": ["Protect the downside first because aggressive mistakes compound faster than patience."],
+  "portfolio_habits": ["Leans into dislocations", "Sizes with cycle awareness"],
+  "commentary_snapshots": [
+    {
+      "as_of": "2024-07-01",
+      "summary": "Kept stressing cycle awareness, asymmetry, and second-level thinking.",
+      "source_note": "Memo summary."
+    }
+  ],
+  "holdings_snapshots": [
+    {
+      "as_of": "2024-12-31",
+      "note": "Credit-oriented and opportunistic style.",
+      "holdings": ["Distressed debt", "Special situations", "Credit-heavy strategies"]
+    }
+  ],
+  "blind_spots": ["Can stay cautious during powerful momentum phases"],
+  "debate_role": "Cycle and risk sentinel"
+}

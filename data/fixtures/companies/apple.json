@@ -1,0 +1,49 @@
+{
+  "ticker": "APPLE",
+  "name": "Apple",
+  "aliases": [
+    "apple",
+    "apple"
+  ],
+  "is_public": true,
+  "is_tech": false,
+  "sector": "Industrials",
+  "industry": "Unclassified Public Company",
+  "archetype": "industrial_cyclical",
+  "description": "Auto-created placeholder fixture for Apple. Replace this with a real company description and updated metrics.",
+  "technology": {
+    "summary": "Placeholder technology summary. Fill in the actual product, technology, or operating model.",
+    "world_impact": "Placeholder impact assessment. Replace with the real market or societal impact.",
+    "feasibility": "Unknown until real research is added.",
+    "requirements": [
+      "Research required",
+      "Management and product review",
+      "Real operating data"
+    ],
+    "constraints": [
+      "Metrics missing",
+      "No live company data loaded yet"
+    ],
+    "competitor_technologies": [
+      "Unknown"
+    ],
+    "preferred_technology": "Unknown",
+    "preferred_rationale": "This fixture was auto-created from a stock-style prompt and needs manual enrichment.",
+    "open_unknowns": [
+      "Technology details and competitive positioning need to be added."
+    ]
+  },
+  "stock": {
+    "as_of": "unknown",
+    "currency": "USD",
+    "price": null,
+    "market_cap": null,
+    "enterprise_value": null,
+    "segment_mix": {},
+    "operating_metrics": {},
+    "valuation_metrics": {},
+    "balance_sheet_metrics": {},
+    "supplemental_metrics": {},
+    "commentary": "This fixture was auto-created because the company was missing from the local fixture set."
+  }
+}

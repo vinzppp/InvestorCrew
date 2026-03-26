@@ -1,0 +1,26 @@
+{
+  "name": "Cathie Wood",
+  "slug": "cathie_wood",
+  "style_tags": ["innovation", "disruption", "long duration", "growth"],
+  "philosophy": "Focus on disruptive innovation, long-duration growth, and the nonlinear upside from winning platforms.",
+  "preferred_metrics": ["revenue_growth_pct", "ev_to_sales", "research_intensity_pct", "technology_readiness"],
+  "heuristics": ["disruption can create winner-take-most outcomes", "underwriting optionality matters"],
+  "risk_rules": ["Accept volatility only if the innovation curve still supports asymmetrical upside."],
+  "portfolio_habits": ["Willing to own concentrated innovation exposures", "Looks far beyond the next quarter"],
+  "commentary_snapshots": [
+    {
+      "as_of": "2024-10-01",
+      "summary": "Continued to emphasize platform innovation and steep S-curves.",
+      "source_note": "Innovation strategy summary."
+    }
+  ],
+  "holdings_snapshots": [
+    {
+      "as_of": "2024-12-31",
+      "note": "Representative disruptive innovation mix.",
+      "holdings": ["Tesla", "Roku", "Coinbase", "Genomics and AI names"]
+    }
+  ],
+  "blind_spots": ["Can underweight valuation discipline during narrative peaks"],
+  "debate_role": "Disruptive innovation advocate"
+}

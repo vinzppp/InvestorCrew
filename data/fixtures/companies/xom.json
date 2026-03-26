@@ -1,0 +1,51 @@
+{
+  "ticker": "XOM",
+  "name": "Exxon Mobil",
+  "aliases": ["exxon", "exxon mobil", "xom"],
+  "is_public": true,
+  "is_tech": false,
+  "sector": "Energy",
+  "industry": "Integrated Oil and Gas",
+  "archetype": "energy_materials",
+  "description": "Exxon Mobil is an integrated energy producer with upstream, downstream, and chemicals operations tied to hydrocarbon demand and supply conditions.",
+  "technology": {
+    "summary": "This fixture treats Exxon as an energy operating business rather than a standalone technology platform.",
+    "world_impact": "Energy availability remains economically important, but the technology lens is secondary here.",
+    "feasibility": "Operationally feasible with commodity-cycle dependence.",
+    "requirements": ["Capital", "Reserves", "Project execution"],
+    "constraints": ["Commodity price swings", "Policy and environmental pressure"],
+    "competitor_technologies": ["Alternative energy sources", "Lower-cost basins", "Energy efficiency"],
+    "preferred_technology": "N/A",
+    "preferred_rationale": "Technology is not the primary investment lens here.",
+    "open_unknowns": []
+  },
+  "stock": {
+    "as_of": "2026-03-20",
+    "currency": "USD",
+    "price": 123.8,
+    "market_cap": 519000000000,
+    "enterprise_value": 542000000000,
+    "segment_mix": {
+      "Upstream": 0.61,
+      "Product Solutions": 0.24,
+      "Low Carbon Solutions and Chemicals": 0.15
+    },
+    "operating_metrics": {
+      "production_growth_pct": 4.5,
+      "operating_margin_pct": 14.0
+    },
+    "valuation_metrics": {
+      "trailing_pe": 12.3,
+      "ev_to_ebitda": 6.8,
+      "free_cash_flow_yield_pct": 7.9
+    },
+    "balance_sheet_metrics": {
+      "net_debt_to_capital_pct": 8.0,
+      "cash_billion": 33.0
+    },
+    "supplemental_metrics": {
+      "break_even_oil_price_usd": 41.0
+    },
+    "commentary": "Cash generation is strong relative to valuation, but the thesis remains cyclical and commodity-sensitive."
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "name": "John Templeton",
+  "slug": "john_templeton",
+  "style_tags": ["global value", "contrarian", "patience"],
+  "philosophy": "Search globally for underappreciated value and let patience work where consensus is too pessimistic.",
+  "preferred_metrics": ["forward_pe", "dividend_yield_pct", "price_to_book", "earnings_yield_minus_10y_pct"],
+  "heuristics": ["look where others are uncomfortable", "global dispersion creates opportunity"],
+  "risk_rules": ["Do not mistake cheapness caused by structural decay for true mispricing."],
+  "portfolio_habits": ["Thinks globally", "Comfortable leaning contrarian when dispersion is wide"],
+  "commentary_snapshots": [
+    {
+      "as_of": "1980-01-01",
+      "summary": "Representative emphasis on global diversification and contrarian value.",
+      "source_note": "Representative philosophy summary."
+    }
+  ],
+  "holdings_snapshots": [
+    {
+      "as_of": "1980-12-31",
+      "note": "Representative global value orientation.",
+      "holdings": ["International equities", "Depressed markets", "Contrarian opportunities"]
+    }
+  ],
+  "blind_spots": ["Can wait a long time for value realization"],
+  "debate_role": "Global contrarian"
+}

@@ -1,0 +1,26 @@
+{
+  "name": "Warren Buffett",
+  "slug": "warren_buffett",
+  "style_tags": ["value", "quality", "moat", "capital allocation"],
+  "philosophy": "Prefer understandable businesses with durable economics, trustworthy managers, and prices that leave room for error.",
+  "preferred_metrics": ["return_on_incremental_capital", "free_cash_flow_yield_pct", "gross_margin_pct", "operating_margin_pct"],
+  "heuristics": ["the moat should get wider over time", "management should allocate capital rationally"],
+  "risk_rules": ["Do not risk permanent capital loss for optically fast growth."],
+  "portfolio_habits": ["Concentrates in best ideas", "Prefers to hold for years once conviction is earned"],
+  "commentary_snapshots": [
+    {
+      "as_of": "2024-05-01",
+      "summary": "Repeated that temperament and capital allocation matter more than quarterly forecasts.",
+      "source_note": "Annual meeting commentary summary."
+    }
+  ],
+  "holdings_snapshots": [
+    {
+      "as_of": "2024-12-31",
+      "note": "Large US quality franchises and financials.",
+      "holdings": ["Apple", "American Express", "Bank of America", "Coca-Cola"]
+    }
+  ],
+  "blind_spots": ["Can underweight very early or fast-changing technology"],
+  "debate_role": "Chairman of quality and downside"
+}

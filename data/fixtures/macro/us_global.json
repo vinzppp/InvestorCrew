@@ -1,0 +1,69 @@
+{
+  "as_of": "2026-03-20",
+  "scope": "us_global",
+  "metrics": {
+    "cpi_yoy_pct": 2.8,
+    "core_cpi_yoy_pct": 3.1,
+    "policy_rate_pct": 4.75,
+    "unemployment_pct": 4.1,
+    "nonfarm_payrolls_k": 185,
+    "gdp_nowcast_pct": 1.9,
+    "ism_manufacturing": 50.4,
+    "ism_services": 52.1,
+    "10y_2y_spread_bps": -18,
+    "high_yield_spread_bps": 360,
+    "vix": 17.2,
+    "brent_oil_usd": 79.0,
+    "dxy": 103.4,
+    "sp500_ytd_pct": 6.1,
+    "market_breadth_pct_above_200dma": 58.0,
+    "sector_leadership": "Technology and industrials are leading while defensives are lagging.",
+    "earnings_revision_breadth_pct": 54.0,
+    "retail_sales_yoy_pct": 2.5
+  },
+  "supplemental_metrics": {
+    "job_openings_million": 8.2,
+    "breakeven_inflation_pct": 2.4,
+    "wage_growth_pct": 4.0,
+    "initial_claims_k": 223,
+    "financial_conditions_index": -0.2
+  },
+  "markets": {
+    "United States": {
+      "forward_pe": 22.1,
+      "trailing_pe": 24.8,
+      "cape": 33.2,
+      "price_to_book": 4.6,
+      "ev_to_ebitda": 15.7,
+      "dividend_yield_pct": 1.4,
+      "earnings_yield_minus_10y_pct": 0.3
+    },
+    "Europe": {
+      "forward_pe": 14.1,
+      "trailing_pe": 15.8,
+      "cape": 20.2,
+      "price_to_book": 1.9,
+      "ev_to_ebitda": 9.1,
+      "dividend_yield_pct": 3.2,
+      "earnings_yield_minus_10y_pct": 2.7
+    },
+    "Japan": {
+      "forward_pe": 15.8,
+      "trailing_pe": 17.1,
+      "cape": 22.4,
+      "price_to_book": 1.5,
+      "ev_to_ebitda": 9.6,
+      "dividend_yield_pct": 2.1,
+      "earnings_yield_minus_10y_pct": 3.4
+    },
+    "China/EM": {
+      "forward_pe": 11.7,
+      "trailing_pe": 12.9,
+      "cape": 14.3,
+      "price_to_book": 1.4,
+      "ev_to_ebitda": 8.1,
+      "dividend_yield_pct": 3.0,
+      "earnings_yield_minus_10y_pct": 4.8
+    }
+  }
+}

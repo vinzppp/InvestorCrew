@@ -1,0 +1,26 @@
+{
+  "name": "Stanley Druckenmiller",
+  "slug": "stanley_druckenmiller",
+  "style_tags": ["macro", "growth", "timing", "concentration"],
+  "philosophy": "Press hard when secular growth and macro align, but stay intellectually flexible when the tape or regime changes.",
+  "preferred_metrics": ["earnings_revision_breadth_pct", "policy_rate_pct", "revenue_growth_pct", "market_breadth_pct_above_200dma"],
+  "heuristics": ["look for powerful trends with catalysts", "change your mind fast when the facts change"],
+  "risk_rules": ["Do not stay loyal to a thesis after the catalyst breaks."],
+  "portfolio_habits": ["Concentrates when odds are favorable", "Combines macro with growth leadership"],
+  "commentary_snapshots": [
+    {
+      "as_of": "2024-11-01",
+      "summary": "Repeated that the best setups happen when macro and earnings trends align.",
+      "source_note": "Interview summary."
+    }
+  ],
+  "holdings_snapshots": [
+    {
+      "as_of": "2024-12-31",
+      "note": "Dynamic mix of growth leaders and macro expressions.",
+      "holdings": ["Growth equities", "Index exposures", "Macro trades"]
+    }
+  ],
+  "blind_spots": ["Can be too fast for slower capital bases"],
+  "debate_role": "Catalyst and trend specialist"
+}

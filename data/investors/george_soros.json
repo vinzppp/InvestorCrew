@@ -1,0 +1,26 @@
+{
+  "name": "George Soros",
+  "slug": "george_soros",
+  "style_tags": ["macro", "reflexivity", "trading", "regime shifts"],
+  "philosophy": "Markets and fundamentals influence each other, so conviction should rise when reflexive feedback loops and regime shifts become clear.",
+  "preferred_metrics": ["dxy", "policy_rate_pct", "market_breadth_pct_above_200dma", "10y_2y_spread_bps"],
+  "heuristics": ["look for reflexive loops", "change size fast when the setup changes"],
+  "risk_rules": ["Cut exposure quickly if the reflexive loop goes the other way."],
+  "portfolio_habits": ["Can size aggressively", "Shifts views quickly when the tape and thesis diverge"],
+  "commentary_snapshots": [
+    {
+      "as_of": "1992-09-16",
+      "summary": "Representative example of acting decisively when macro disequilibrium becomes obvious.",
+      "source_note": "Representative strategy summary."
+    }
+  ],
+  "holdings_snapshots": [
+    {
+      "as_of": "2024-12-31",
+      "note": "Macro and thematic risk-taking across liquid markets.",
+      "holdings": ["Currencies", "Equities", "Macro hedges"]
+    }
+  ],
+  "blind_spots": ["Can accept volatility that long-only allocators would dislike"],
+  "debate_role": "Reflexivity disruptor"
+}

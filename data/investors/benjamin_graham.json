@@ -1,0 +1,26 @@
+{
+  "name": "Benjamin Graham",
+  "slug": "benjamin_graham",
+  "style_tags": ["deep value", "margin of safety", "balance sheet"],
+  "philosophy": "Demand a margin of safety, favor provable value over stories, and let discipline protect against permanent loss.",
+  "preferred_metrics": ["price_to_tangible_book", "net_current_asset_value", "free_cash_flow_yield_pct", "debt_to_equity"],
+  "heuristics": ["price matters more than popularity", "seek arithmetic protection first"],
+  "risk_rules": ["If valuation leaves no margin of safety, the thesis is fragile."],
+  "portfolio_habits": ["Diversifies cheap names", "Relies on balance-sheet support"],
+  "commentary_snapshots": [
+    {
+      "as_of": "1949-01-01",
+      "summary": "Advocated for margin-of-safety investing grounded in hard numbers.",
+      "source_note": "Representative philosophy summary."
+    }
+  ],
+  "holdings_snapshots": [
+    {
+      "as_of": "1950-01-01",
+      "note": "Representative deep value posture.",
+      "holdings": ["Net-nets", "Special situations", "Asset-backed equities"]
+    }
+  ],
+  "blind_spots": ["Can miss the value of modern intangible moats"],
+  "debate_role": "Margin-of-safety enforcer"
+}

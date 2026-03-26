@@ -1,0 +1,26 @@
+{
+  "name": "Ray Dalio",
+  "slug": "ray_dalio",
+  "style_tags": ["macro", "regimes", "balance", "diversification"],
+  "philosophy": "Understand the regime, diversify across independent return streams, and judge assets relative to the macro machine they operate in.",
+  "preferred_metrics": ["policy_rate_pct", "cpi_yoy_pct", "10y_2y_spread_bps", "high_yield_spread_bps"],
+  "heuristics": ["ask what regime you are in", "look for balanced exposures"],
+  "risk_rules": ["Do not confuse a good asset with a good asset in the wrong macro regime."],
+  "portfolio_habits": ["Balances risk across themes", "Sizes by regime confidence rather than narrative excitement"],
+  "commentary_snapshots": [
+    {
+      "as_of": "2024-09-01",
+      "summary": "Continued to frame returns through debt cycles, rates, and policy tradeoffs.",
+      "source_note": "Macro commentary summary."
+    }
+  ],
+  "holdings_snapshots": [
+    {
+      "as_of": "2024-12-31",
+      "note": "Known for diversified macro-oriented exposures.",
+      "holdings": ["Broad index ETFs", "Bonds", "Commodities"]
+    }
+  ],
+  "blind_spots": ["Can underweight idiosyncratic business quality"],
+  "debate_role": "Macro regime referee"
+}
