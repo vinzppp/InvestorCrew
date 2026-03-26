@@ -171,6 +171,47 @@ pre {
   flex-wrap: wrap;
 }
 
+.step-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.step-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.step-chip.active {
+  background: rgba(242, 184, 75, 0.15);
+  border-color: rgba(242, 184, 75, 0.3);
+  color: var(--text);
+}
+
+.plan-textarea,
+.prompt-editor-large {
+  min-height: 180px;
+  resize: vertical;
+}
+
+.prompt-editor-large {
+  min-height: 260px;
+}
+
+.warning-banner {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(242, 184, 75, 0.28);
+  background: rgba(242, 184, 75, 0.1);
+  color: var(--text);
+}
+
 .button {
   display: inline-flex;
   align-items: center;
@@ -317,6 +358,17 @@ pre {
   border: 1px solid rgba(255, 255, 255, 0.04);
 }
 
+.timeline-grid {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.timeline-cell {
+  display: grid;
+  gap: 8px;
+}
+
 .card-grid,
 .section-grid,
 .investor-grid {
@@ -359,6 +411,16 @@ pre {
   overflow-wrap: anywhere;
   word-break: break-word;
   overscroll-behavior: contain;
+}
+
+.analysis-box-tall {
+  min-height: 180px;
+  max-height: 280px;
+}
+
+.analysis-box-xl {
+  min-height: 220px;
+  max-height: 360px;
 }
 
 .muted-box {

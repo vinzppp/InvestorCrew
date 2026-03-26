@@ -17,7 +17,7 @@ export function ConfigureDashboard() {
       listInvestors(),
       listSettings()
     ]);
-    setPrompts(nextPrompts);
+    setPrompts(nextPrompts.filter((prompt) => prompt.key !== "judge"));
     setInvestors(nextInvestors);
     setSettings(nextSettings);
   }

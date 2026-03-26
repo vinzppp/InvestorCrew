@@ -2,6 +2,7 @@ import {
   CompanyDetail,
   CompanySummary,
   InvestorProfilePayload,
+  PlanningDraft,
   PromptTemplate,
   ReportDetail,
   ReportEvent,
@@ -32,6 +33,30 @@ export function getApiBase(): string {
 
 export function getReportArtifactUrl(reportId: string, artifactKind: "markdown" | "json"): string {
   return `${API_BASE}/api/reports/${reportId}/artifacts/${artifactKind}`;
+}
+
+export async function createPlan(question: string, context: string, researchMode?: string): Promise<PlanningDraft> {
+  return readJson<PlanningDraft>("/api/plans", {
+    method: "POST",
+    body: JSON.stringify({ question, context, research_mode: researchMode ?? null })
+  });
+}
+
+export async function getPlan(planId: string): Promise<PlanningDraft> {
+  return readJson<PlanningDraft>(`/api/plans/${planId}`);
+}
+
+export async function updatePlan(planId: string, payload: Record<string, unknown>): Promise<PlanningDraft> {
+  return readJson<PlanningDraft>(`/api/plans/${planId}`, {
+    method: "PUT",
+    body: JSON.stringify({ payload })
+  });
+}
+
+export async function approvePlan(planId: string): Promise<RunRecord> {
+  return readJson<RunRecord>(`/api/plans/${planId}/approve`, {
+    method: "POST"
+  });
 }
 
 export async function createRun(question: string, context: string): Promise<RunRecord> {

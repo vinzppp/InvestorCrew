@@ -3,13 +3,24 @@
 import Link from "next/link";
 import { ReactNode, useEffect, useMemo, useState } from "react";
 
-import { StructuredValue, formatLabel } from "@/components/data-view";
 import { createSelfReview, getReport, getReportArtifactUrl } from "@/lib/api";
 import { ReportDetail as ReportDetailType } from "@/lib/types";
 
 function renderValue(value: unknown): string {
   if (value === null || value === undefined) return "n/a";
   return String(value);
+}
+
+function renderList(value: unknown, empty = "n/a"): string {
+  if (!Array.isArray(value) || !value.length) return empty;
+  return value.map((item) => `• ${String(item)}`).join("\n");
+}
+
+function renderMetricMap(value: unknown): string {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return "n/a";
+  const entries = Object.entries(value as Record<string, unknown>);
+  if (!entries.length) return "n/a";
+  return entries.map(([key, item]) => `${key}: ${String(item)}`).join("\n");
 }
 
 function voteCounts(votes: Array<Record<string, unknown>>, proposalId: string): Record<string, number> {
@@ -22,203 +33,34 @@ function voteCounts(votes: Array<Record<string, unknown>>, proposalId: string): 
     }, {});
 }
 
-function MetricDictionary({
-  title,
-  values
-}: {
-  title: string;
-  values: Record<string, unknown> | undefined;
-}) {
-  if (!values || !Object.keys(values).length) {
-    return null;
-  }
-  return (
-    <div className="stack compact-stack">
-      <span className="meta-label">{title}</span>
-      <dl className="kv-grid">
-        {Object.entries(values).map(([key, value]) => (
-          <div key={key} className="kv-item">
-            <dt>{formatLabel(key)}</dt>
-            <dd>{renderValue(value)}</dd>
-          </div>
-        ))}
-      </dl>
-    </div>
-  );
-}
-
-function ScrollableTextBlock({
-  label,
-  text
-}: {
-  label: string;
-  text: unknown;
-}) {
+function ScrollableTextBlock({ label, text }: { label: string; text: unknown }) {
   return (
     <div className="analysis-block">
       <span className="meta-label">{label}</span>
-      <div className="analysis-box">{renderValue(text)}</div>
+      <div className="analysis-box analysis-box-tall">{renderValue(text)}</div>
     </div>
   );
 }
 
-function ExpandSection({
-  title,
+function DiligenceSection({
   eyebrow,
-  subtitle,
-  children,
-  defaultOpen = false
+  title,
+  children
 }: {
-  title: string;
   eyebrow: string;
-  subtitle?: string;
+  title: string;
   children: ReactNode;
-  defaultOpen?: boolean;
 }) {
   return (
-    <details className="expand-section" open={defaultOpen}>
-      <summary>
+    <section className="panel">
+      <div className="panel-header">
         <div>
           <p className="eyebrow">{eyebrow}</p>
           <h2>{title}</h2>
-          {subtitle && <p className="hero-copy">{subtitle}</p>}
         </div>
-        <span className="expand-hint">{defaultOpen ? "Collapse" : "Expand"}</span>
-      </summary>
-      <div className="details-body">{children}</div>
-    </details>
-  );
-}
-
-function DiligenceArtifact({ artifact }: { artifact: ReportDetailType["artifacts"][number] }) {
-  const payload = artifact.payload;
-
-  if (artifact.artifact_type === "technical_report") {
-    return (
-      <article className="content-card">
-        <h3>{artifact.title}</h3>
-        <div className="stack compact-stack">
-          <p>{renderValue(payload.summary)}</p>
-          <div className="section-grid">
-            <div className="summary-card">
-              <span className="meta-label">What It Is</span>
-              <p>{renderValue(payload.what_it_is)}</p>
-            </div>
-            <div className="summary-card">
-              <span className="meta-label">World Impact</span>
-              <p>{renderValue(payload.world_impact)}</p>
-            </div>
-            <div className="summary-card">
-              <span className="meta-label">Feasibility</span>
-              <p>{renderValue(payload.feasibility)}</p>
-            </div>
-            <div className="summary-card">
-              <span className="meta-label">Preferred Technology</span>
-              <p>{renderValue(payload.preferred_technology)}</p>
-              <p className="muted">{renderValue(payload.preferred_rationale)}</p>
-            </div>
-          </div>
-          <div className="section-grid">
-            <div className="summary-card">
-              <span className="meta-label">Requirements</span>
-              <StructuredValue value={payload.requirements ?? []} compact />
-            </div>
-            <div className="summary-card">
-              <span className="meta-label">Constraints</span>
-              <StructuredValue value={payload.constraints ?? []} compact />
-            </div>
-            <div className="summary-card">
-              <span className="meta-label">Competitive Landscape</span>
-              <StructuredValue value={payload.competitive_landscape ?? []} compact />
-            </div>
-            <div className="summary-card">
-              <span className="meta-label">Open Unknowns</span>
-              <StructuredValue value={payload.open_unknowns ?? []} compact />
-            </div>
-          </div>
-        </div>
-      </article>
-    );
-  }
-
-  if (artifact.artifact_type === "stock_report") {
-    return (
-      <article className="content-card">
-        <h3>{artifact.title}</h3>
-        <div className="section-grid">
-          <div className="summary-card">
-            <span className="meta-label">Company</span>
-            <strong>
-              {renderValue(payload.company_name)} ({renderValue(payload.ticker)})
-            </strong>
-            <p>{renderValue(payload.business_summary)}</p>
-          </div>
-          <div className="summary-card">
-            <span className="meta-label">Market Read</span>
-            <strong>{renderValue(payload.cheap_or_expensive)}</strong>
-            <p>As of {renderValue(payload.as_of)}</p>
-          </div>
-          <div className="summary-card">
-            <span className="meta-label">Selected Metrics</span>
-            <StructuredValue value={payload.selected_metrics ?? []} compact />
-          </div>
-          <div className="summary-card">
-            <span className="meta-label">Missing Metrics</span>
-            <StructuredValue value={payload.missing_metrics ?? []} compact />
-          </div>
-        </div>
-        <div className="section-grid">
-          <MetricDictionary title="Operating Metrics" values={payload.operating_metrics as Record<string, unknown>} />
-          <MetricDictionary title="Valuation Metrics" values={payload.valuation_metrics as Record<string, unknown>} />
-          <MetricDictionary
-            title="Balance Sheet Metrics"
-            values={payload.balance_sheet_metrics as Record<string, unknown>}
-          />
-          <div className="summary-card">
-            <span className="meta-label">Segment Mix</span>
-            <StructuredValue value={payload.segment_mix ?? {}} compact />
-          </div>
-        </div>
-      </article>
-    );
-  }
-
-  if (artifact.artifact_type === "economic_report") {
-    return (
-      <article className="content-card">
-        <h3>{artifact.title}</h3>
-        <div className="section-grid">
-          <div className="summary-card">
-            <span className="meta-label">Summary</span>
-            <p>{renderValue(payload.summary)}</p>
-          </div>
-          <div className="summary-card">
-            <span className="meta-label">Richest Market</span>
-            <strong>{renderValue(payload.richest_market)}</strong>
-          </div>
-          <div className="summary-card">
-            <span className="meta-label">Cheapest Market</span>
-            <strong>{renderValue(payload.cheapest_market)}</strong>
-          </div>
-          <div className="summary-card">
-            <span className="meta-label">Selected Metrics</span>
-            <StructuredValue value={payload.selected_metrics ?? []} compact />
-          </div>
-        </div>
-        <MetricDictionary title="Core Metrics" values={payload.core_metrics as Record<string, unknown>} />
-        <div className="summary-card">
-          <span className="meta-label">Market Comparison</span>
-          <StructuredValue value={payload.market_comparison ?? []} compact />
-        </div>
-      </article>
-    );
-  }
-
-  return (
-    <article className="content-card">
-      <h3>{artifact.title}</h3>
-      <StructuredValue value={payload} />
-    </article>
+      </div>
+      {children}
+    </section>
   );
 }
 
@@ -233,21 +75,28 @@ export function ReportDetail({ reportId, companyId }: { reportId: string; compan
       .catch((caught) => setError(caught instanceof Error ? caught.message : "Failed to load report"));
   }, [reportId]);
 
-  const finalResult = useMemo(() => {
-    return (detail?.run.final_result ?? {}) as Record<string, unknown>;
-  }, [detail]);
-
-  const diligencePacket = useMemo(() => {
-    return ((finalResult.diligence_packet as Record<string, unknown> | undefined) ?? {}) as Record<string, unknown>;
-  }, [finalResult]);
-
-  const metricSelections = useMemo(() => {
-    return (diligencePacket.metric_selections as Array<Record<string, unknown>> | undefined) ?? [];
-  }, [diligencePacket]);
-
-  const analyses = useMemo(() => {
-    return (finalResult.analyses as Array<Record<string, unknown>> | undefined) ?? [];
-  }, [finalResult]);
+  const finalResult = useMemo(() => (detail?.run.final_result ?? {}) as Record<string, unknown>, [detail]);
+  const diligencePacket = useMemo(
+    () => ((finalResult.diligence_packet as Record<string, unknown> | undefined) ?? {}) as Record<string, unknown>,
+    [finalResult]
+  );
+  const committeeMemo = useMemo(
+    () => ((finalResult.committee_memo as Record<string, unknown> | undefined) ?? {}) as Record<string, unknown>,
+    [finalResult]
+  );
+  const committeeReasoning = useMemo(
+    () => ((finalResult.committee_reasoning as unknown[] | undefined) ?? []).map(String),
+    [finalResult]
+  );
+  const analyses = useMemo(() => (finalResult.analyses as Array<Record<string, unknown>> | undefined) ?? [], [finalResult]);
+  const discussionLog = useMemo(
+    () => (finalResult.discussion_log as Array<Record<string, unknown>> | undefined) ?? [],
+    [finalResult]
+  );
+  const technicalReviews = useMemo(
+    () => (finalResult.technical_review_rounds as Array<Record<string, unknown>> | undefined) ?? [],
+    [finalResult]
+  );
 
   async function runSelfReview() {
     setReviewBusy(true);
@@ -271,11 +120,12 @@ export function ReportDetail({ reportId, companyId }: { reportId: string; compan
     );
   }
 
-  const classification = (detail.run.classification ?? {}) as Record<string, unknown>;
+  const disposition = renderValue(finalResult.final_disposition ?? "watchlist");
+  const blockedReason = finalResult.blocked_reason;
+  const technicalReport = (diligencePacket.technical_report ?? {}) as Record<string, unknown>;
   const stockReport = (diligencePacket.stock_report ?? {}) as Record<string, unknown>;
-  const techReport = (diligencePacket.technical_report ?? {}) as Record<string, unknown>;
-  const economicReport = (diligencePacket.economic_report ?? {}) as Record<string, unknown>;
-  const supplementalNotes = (diligencePacket.supplemental_notes as unknown[]) ?? [];
+  const industryReport = (diligencePacket.industry_report ?? {}) as Record<string, unknown>;
+  const macroReport = (diligencePacket.economic_report ?? {}) as Record<string, unknown>;
 
   return (
     <>
@@ -285,11 +135,13 @@ export function ReportDetail({ reportId, companyId }: { reportId: string; compan
             <p className="eyebrow">Executive View</p>
             <h2>{detail.run.question}</h2>
             <p className="hero-copy">
-              Start with the high-level crew read here, then expand the diligence, proposals, transcript, and review
-              sections only when you want the deeper mechanics.
+              This view starts with the committee conclusion, then lets you read the diligence, investor discussion,
+              proposals, and final votes without exposing raw markdown or system logs.
             </p>
           </div>
-          <span className="status-pill neutral">{detail.run.status}</span>
+          <span className={`status-pill ${disposition === "invest" ? "good" : disposition === "no_invest" ? "bad" : "warn"}`}>
+            {disposition}
+          </span>
         </div>
 
         <div className="section-grid">
@@ -303,90 +155,182 @@ export function ReportDetail({ reportId, companyId }: { reportId: string; compan
             )}
           </article>
           <article className="summary-card">
-            <span className="meta-label">Routing</span>
-            <strong>{renderValue(classification.category)}</strong>
-            <p>{renderValue(classification.reason)}</p>
-          </article>
-          <article className="summary-card">
-            <span className="meta-label">Crew Output</span>
-            <strong>{detail.proposals.length} proposals</strong>
-            <p>{renderValue(finalResult.follow_up_rounds_used)} follow-up rounds used</p>
+            <span className="meta-label">Conclusion</span>
+            <div className="analysis-box analysis-box-tall">
+              {committeeMemo.conclusion
+                ? renderValue(committeeMemo.conclusion)
+                : blockedReason
+                  ? renderValue(blockedReason)
+                  : "Conclusion unavailable."}
+            </div>
           </article>
           <article className="summary-card">
             <span className="meta-label">Exports</span>
             <div className="stack compact-stack">
               {detail.run.markdown_path && (
-                <a
-                  className="inline-link"
-                  href={getReportArtifactUrl(reportId, "markdown")}
-                  target="_blank"
-                  rel="noreferrer"
-                >
+                <a className="inline-link" href={getReportArtifactUrl(reportId, "markdown")} target="_blank" rel="noreferrer">
                   Download report
                 </a>
               )}
               {detail.run.json_path && (
-                <a
-                  className="inline-link"
-                  href={getReportArtifactUrl(reportId, "json")}
-                  target="_blank"
-                  rel="noreferrer"
-                >
+                <a className="inline-link" href={getReportArtifactUrl(reportId, "json")} target="_blank" rel="noreferrer">
                   Download JSON
                 </a>
               )}
             </div>
           </article>
+          <article className="summary-card">
+            <span className="meta-label">Disposition</span>
+            <div className="analysis-box">
+              {renderValue(committeeMemo.disposition || disposition)}
+              {blockedReason ? `\n\nBlocked: ${renderValue(blockedReason)}` : ""}
+            </div>
+          </article>
         </div>
 
-        <div className="section-grid">
-          {Boolean(techReport.summary) && (
-            <article className="summary-card">
-              <span className="meta-label">Technical Read</span>
-              <p>{renderValue(techReport.summary)}</p>
-            </article>
-          )}
-          {Boolean(stockReport.cheap_or_expensive) && (
-            <article className="summary-card">
-              <span className="meta-label">Stock Read</span>
-              <p>{renderValue(stockReport.cheap_or_expensive)}</p>
-            </article>
-          )}
-          {Boolean(economicReport.summary) && (
-            <article className="summary-card">
-              <span className="meta-label">Macro Read</span>
-              <p>{renderValue(economicReport.summary)}</p>
-            </article>
-          )}
-          {detail.proposals[0] && (
-            <article className="summary-card">
-              <span className="meta-label">Top Proposal</span>
-              <strong>{renderValue(detail.proposals[0].title)}</strong>
-              <p>{renderValue(detail.proposals[0].thesis)}</p>
-            </article>
-          )}
+        <div className="card-grid">
+          <article className="summary-card">
+            <span className="meta-label">Thesis</span>
+            <div className="analysis-box analysis-box-tall">{renderValue(committeeMemo.thesis)}</div>
+          </article>
+          <article className="summary-card">
+            <span className="meta-label">Opportunities</span>
+            <div className="analysis-box analysis-box-tall">{renderList(committeeMemo.opportunities, "No committee opportunities recorded.")}</div>
+          </article>
+          <article className="summary-card">
+            <span className="meta-label">Risks</span>
+            <div className="analysis-box analysis-box-tall">{renderList(committeeMemo.risks, "No committee risks recorded.")}</div>
+          </article>
+          <article className="summary-card">
+            <span className="meta-label">How The Committee Weighed It</span>
+            <div className="analysis-box analysis-box-tall">{renderValue(committeeMemo.weighing)}</div>
+          </article>
         </div>
       </section>
+
+      {(Object.keys(technicalReport).length > 0 || technicalReviews.length > 0) && (
+        <DiligenceSection eyebrow="Technical Diligence" title="Technical mechanism, feasibility, and review gate">
+          <div className="card-grid">
+            <article className="content-card">
+              <h3>Technical Report</h3>
+              <div className="stack compact-stack">
+                <ScrollableTextBlock label="What It Is" text={technicalReport.what_it_is} />
+                <ScrollableTextBlock label="Scientific Mechanism" text={technicalReport.scientific_mechanism} />
+                <ScrollableTextBlock label="Proof Status" text={technicalReport.proof_status} />
+                <ScrollableTextBlock label="Feasibility" text={technicalReport.feasibility} />
+                <ScrollableTextBlock label="Engineering Bottlenecks" text={renderList(technicalReport.engineering_bottlenecks)} />
+                <ScrollableTextBlock label="Timeline" text={technicalReport.timeline} />
+                <ScrollableTextBlock label="Regulatory Path" text={technicalReport.regulatory_path} />
+                <ScrollableTextBlock label="Competitive Landscape" text={renderList(technicalReport.competitive_landscape)} />
+                <ScrollableTextBlock label="Failure Modes" text={renderList(technicalReport.failure_modes)} />
+              </div>
+            </article>
+            {technicalReviews.map((review, index) => (
+              <article key={`review-${index}`} className="content-card">
+                <h3>Technical Review Round {renderValue(review.round_index)}</h3>
+                <div className="stack compact-stack">
+                  <ScrollableTextBlock label="Summary" text={review.summary} />
+                  <ScrollableTextBlock
+                    label="Scores"
+                    text={`Overall ${renderValue(review.overall_score)}\nDepth ${renderValue(review.depth_score)}\nEvidence ${renderValue(
+                      review.evidence_quality_score
+                    )}\nFeasibility ${renderValue(review.feasibility_reasoning_score)}\nCompetitive ${renderValue(
+                      review.competitive_analysis_score
+                    )}\nClarity ${renderValue(review.clarity_score)}`}
+                  />
+                  <ScrollableTextBlock label="Findings" text={renderList(review.findings)} />
+                  <ScrollableTextBlock label="Required Revisions" text={renderList(review.required_revisions)} />
+                </div>
+              </article>
+            ))}
+          </div>
+        </DiligenceSection>
+      )}
+
+      {Object.keys(stockReport).length > 0 && (
+        <DiligenceSection eyebrow="Stock Diligence" title="Business quality, valuation, and balance sheet">
+          <div className="card-grid">
+            <article className="content-card">
+              <h3>Business Model</h3>
+              <div className="stack compact-stack">
+                <ScrollableTextBlock label="Business Summary" text={stockReport.business_summary} />
+                <ScrollableTextBlock label="Valuation View" text={stockReport.cheap_or_expensive} />
+                <ScrollableTextBlock label="Segment Mix" text={renderMetricMap(stockReport.segment_mix)} />
+              </div>
+            </article>
+            <article className="content-card">
+              <h3>Metrics</h3>
+              <div className="stack compact-stack">
+                <ScrollableTextBlock label="Selected Metrics" text={renderList(stockReport.selected_metrics)} />
+                <ScrollableTextBlock label="Operating Metrics" text={renderMetricMap(stockReport.operating_metrics)} />
+                <ScrollableTextBlock label="Valuation Metrics" text={renderMetricMap(stockReport.valuation_metrics)} />
+                <ScrollableTextBlock label="Balance Sheet / Runway" text={renderMetricMap(stockReport.balance_sheet_metrics)} />
+                <ScrollableTextBlock label="Open Unknowns" text={renderList(stockReport.open_unknowns)} />
+              </div>
+            </article>
+          </div>
+        </DiligenceSection>
+      )}
+
+      {Object.keys(industryReport).length > 0 && (
+        <DiligenceSection eyebrow="Industry Diligence" title="Market size, competition, and customer demand">
+          <div className="card-grid">
+            <article className="content-card">
+              <h3>Industry Overview</h3>
+              <div className="stack compact-stack">
+                <ScrollableTextBlock label="Summary" text={industryReport.summary} />
+                <ScrollableTextBlock label="Market Size" text={industryReport.market_size} />
+                <ScrollableTextBlock label="Market Structure" text={industryReport.market_structure} />
+                <ScrollableTextBlock label="Customer Overview" text={industryReport.customer_overview} />
+              </div>
+            </article>
+            <article className="content-card">
+              <h3>Industry Drivers And Risks</h3>
+              <div className="stack compact-stack">
+                <ScrollableTextBlock label="Growth Drivers" text={renderList(industryReport.growth_drivers)} />
+                <ScrollableTextBlock label="Competitors" text={renderList(industryReport.competitors)} />
+                <ScrollableTextBlock label="Opportunities" text={renderList(industryReport.opportunities)} />
+                <ScrollableTextBlock label="Risks" text={renderList(industryReport.risks)} />
+              </div>
+            </article>
+          </div>
+        </DiligenceSection>
+      )}
+
+      {Object.keys(macroReport).length > 0 && (
+        <DiligenceSection eyebrow="Macro Diligence" title="Regime summary and market conditions">
+          <div className="card-grid">
+            <article className="content-card">
+              <h3>Macro View</h3>
+              <div className="stack compact-stack">
+                <ScrollableTextBlock label="Summary" text={macroReport.summary} />
+                <ScrollableTextBlock label="Key Indicators" text={renderMetricMap(macroReport.core_metrics)} />
+                <ScrollableTextBlock label="Richest Market" text={macroReport.richest_market} />
+                <ScrollableTextBlock label="Cheapest Market" text={macroReport.cheapest_market} />
+              </div>
+            </article>
+          </div>
+        </DiligenceSection>
+      )}
 
       <section className="panel">
         <div className="panel-header">
           <div>
             <p className="eyebrow">Investor Panel</p>
             <h2>Full investor discussion</h2>
-            <p className="hero-copy">This stays expanded by default so you can read the crew without drilling down.</p>
           </div>
         </div>
         <div className="investor-grid">
           {analyses.map((analysis) => (
-            <article key={String(analysis.investor_slug ?? analysis.investor_name)} className="content-card">
+            <article key={renderValue(analysis.investor_slug ?? analysis.investor_name)} className="content-card">
               <h3>{renderValue(analysis.investor_name)}</h3>
               <div className="stack compact-stack investor-analysis-stack">
-                <ScrollableTextBlock label="Situation" text={analysis.situation} />
-                <ScrollableTextBlock label="Interpretation" text={analysis.interpretation} />
-                <ScrollableTextBlock label="Thesis" text={analysis.thesis} />
-                <ScrollableTextBlock label="Falsification" text={analysis.falsification} />
+                <ScrollableTextBlock label="Philosophy Fit" text={analysis.situation} />
+                <ScrollableTextBlock label="Edge And Evidence" text={analysis.interpretation} />
+                <ScrollableTextBlock label="Upside Case" text={analysis.thesis} />
+                <ScrollableTextBlock label="Downside And Falsification" text={analysis.falsification} />
                 <ScrollableTextBlock label="Portfolio Fit" text={analysis.portfolio} />
-                <ScrollableTextBlock label="Conclusion and Vote" text={analysis.conclusion} />
+                <ScrollableTextBlock label="Final Stance" text={analysis.conclusion} />
                 {Array.isArray(analysis.updates) && analysis.updates.length > 0 && (
                   <ScrollableTextBlock label="Updates" text={analysis.updates.map((item) => `• ${item}`).join("\n")} />
                 )}
@@ -397,189 +341,151 @@ export function ReportDetail({ reportId, companyId }: { reportId: string; compan
       </section>
 
       <section className="panel">
-        <ExpandSection
-          eyebrow="Metric Plan"
-          title="Chosen lenses before the debate"
-          subtitle="Metric selection stays tucked away at first so the report opens with conclusions rather than setup."
-        >
-          <div className="card-grid">
-            {metricSelections.map((selection, index) => (
-              <article key={`${selection.scope as string}-${index}`} className="content-card">
-                <h3>{renderValue(selection.scope)}</h3>
-                <p className="muted">{renderValue(selection.rationale)}</p>
-                <div className="stack compact-stack">
-                  <div>
-                    <span className="meta-label">Lens</span>
-                    <strong>{renderValue(selection.lens)}</strong>
-                  </div>
-                  <div>
-                    <span className="meta-label">Chosen Metrics</span>
-                    <StructuredValue value={selection.chosen_metrics ?? []} compact />
-                  </div>
-                  <div>
-                    <span className="meta-label">Excluded Metrics</span>
-                    <StructuredValue value={selection.excluded_metrics ?? []} compact />
-                  </div>
-                </div>
+        <div className="panel-header">
+          <div>
+            <p className="eyebrow">Investment Committee</p>
+            <h2>Committee proposals and investor votes</h2>
+          </div>
+        </div>
+        {!!committeeReasoning.length && (
+          <div className="section-grid">
+            {committeeReasoning.map((reason, index) => (
+              <article key={`reason-${index}`} className="summary-card">
+                <span className="meta-label">Committee Reasoning {index + 1}</span>
+                <div className="analysis-box analysis-box-tall">{reason}</div>
               </article>
             ))}
           </div>
-        </ExpandSection>
-      </section>
-
-      <section className="panel">
-        <ExpandSection
-          eyebrow="Due Diligence"
-          title="Reports sent to the investor crew"
-          subtitle="Technical, stock, and macro packets are still here, but they open only when you want the underlying evidence."
-        >
-          <div className="section-grid">
-            {detail.artifacts.map((artifact, index) => (
-              <DiligenceArtifact key={`${artifact.artifact_type}-${index}`} artifact={artifact} />
-            ))}
-          </div>
-        </ExpandSection>
-      </section>
-
-      <section className="panel">
-        <ExpandSection
-          eyebrow="Proposals"
-          title="Moderator synthesis and voting"
-          subtitle="Proposal drivers and risks now scroll when the lists get long so the cards stay readable."
-        >
-          <div className="section-grid">
-            {detail.proposals.map((proposal, index) => {
-              const counts = voteCounts(detail.votes, String(proposal.proposal_id));
-              return (
-                <article key={`${proposal.proposal_id as string}-${index}`} className="content-card">
-                  <h3>{renderValue(proposal.title)}</h3>
-                  <div className="stack compact-stack">
-                    <div>
-                      <span className="meta-label">Action</span>
-                      <strong>{renderValue(proposal.action)}</strong>
+        )}
+        {detail.proposals.length ? (
+          <div className="stack">
+            <div className="card-grid">
+              {detail.proposals.map((proposal) => {
+                const counts = voteCounts(detail.votes, String(proposal.proposal_id));
+                return (
+                  <article key={String(proposal.proposal_id)} className="content-card">
+                    <h3>{renderValue(proposal.title)}</h3>
+                    <div className="stack compact-stack">
+                      <ScrollableTextBlock label="Action" text={proposal.action} />
+                      <ScrollableTextBlock label="Thesis" text={proposal.thesis} />
+                      <ScrollableTextBlock label="Drivers" text={renderList(proposal.key_drivers)} />
+                      <ScrollableTextBlock label="Risks" text={renderList(proposal.key_risks)} />
+                      <ScrollableTextBlock label="Portfolio Note" text={proposal.portfolio_note} />
+                      <div className="chip-scroll">
+                        <div className="chip-row nowrap-row">
+                          {Object.entries(counts).map(([key, value]) => (
+                            <span key={key} className="metric-chip">
+                              {key}: {value}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <span className="meta-label">Thesis</span>
-                      <p>{renderValue(proposal.thesis)}</p>
-                    </div>
-                    <div>
-                      <span className="meta-label">Horizon</span>
-                      <p>{renderValue(proposal.horizon)}</p>
-                    </div>
-                    <div>
-                      <span className="meta-label">Drivers</span>
-                      <StructuredValue value={proposal.key_drivers ?? []} compact />
-                    </div>
-                    <div>
-                      <span className="meta-label">Risks</span>
-                      <StructuredValue value={proposal.key_risks ?? []} compact />
-                    </div>
-                    <div>
-                      <span className="meta-label">Portfolio Note</span>
-                      <p>{renderValue(proposal.portfolio_note)}</p>
-                    </div>
-                    <div>
-                      <span className="meta-label">Vote Mix</span>
-                      <StructuredValue value={counts} compact />
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-
-          <div className="table-scroll">
-            <table className="vote-table">
-              <thead>
-                <tr>
-                  <th>Proposal</th>
-                  <th>Investor</th>
-                  <th>Vote</th>
-                  <th>Rationale</th>
-                </tr>
-              </thead>
-              <tbody>
-                {detail.votes.map((vote, index) => (
-                  <tr key={`${index}-${vote.proposal_id}`}>
-                    <td>{renderValue(vote.proposal_id)}</td>
-                    <td>{renderValue(vote.investor_name)}</td>
-                    <td>{renderValue(vote.vote)}</td>
-                    <td>{renderValue(vote.rationale)}</td>
+                  </article>
+                );
+              })}
+            </div>
+            <div className="table-scroll">
+              <table className="vote-table">
+                <thead>
+                  <tr>
+                    <th>Investor</th>
+                    {detail.proposals.map((proposal) => (
+                      <th key={String(proposal.proposal_id)}>{renderValue(proposal.proposal_id)}</th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {analyses.map((analysis) => (
+                    <tr key={renderValue(analysis.investor_slug)}>
+                      <td>{renderValue(analysis.investor_name)}</td>
+                      {detail.proposals.map((proposal) => {
+                        const record = detail.votes.find(
+                          (vote) =>
+                            vote.proposal_id === proposal.proposal_id &&
+                            vote.investor_name === analysis.investor_name
+                        );
+                        return (
+                          <td key={`${renderValue(analysis.investor_slug)}-${renderValue(proposal.proposal_id)}`}>
+                            {renderValue(record?.vote ?? "n/a")}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </ExpandSection>
+        ) : (
+          <article className="content-card">
+            <h3>No-invest outcome</h3>
+            <div className="analysis-box analysis-box-tall">
+              {committeeMemo.conclusion
+                ? renderValue(committeeMemo.conclusion)
+                : blockedReason
+                  ? renderValue(blockedReason)
+                  : "No proposal cleared the bar for action."}
+            </div>
+          </article>
+        )}
       </section>
 
       <section className="panel">
-        <ExpandSection
-          eyebrow="Transcript"
-          title="Full orchestration log"
-          subtitle="The live system transcript is still available, but it stays collapsed until you need the exact event trail."
-        >
-          <ol className="timeline">
-            {detail.events.map((event) => (
-              <li key={`${event.sequence}-${event.title}`} className="timeline-item">
-                <div className="timeline-header">
-                  <span className="timeline-stage">{event.stage}</span>
-                  <span className="timeline-actor">{event.actor ?? "system"}</span>
-                  <span className="timeline-time">{event.created_at.slice(11, 19)}</span>
-                </div>
-                <strong>{event.title}</strong>
-                <div className="timeline-body">
-                  <StructuredValue value={event.payload} compact />
-                </div>
-              </li>
-            ))}
-          </ol>
-        </ExpandSection>
-      </section>
-
-      <section className="panel">
-        <ExpandSection
-          eyebrow="Follow-Up"
-          title="Supplemental diligence notes"
-          subtitle="Extra requests and missing-evidence notes are grouped separately so they do not crowd the main read."
-        >
-          <StructuredValue value={supplementalNotes} compact />
-        </ExpandSection>
+        <div className="panel-header">
+          <div>
+            <p className="eyebrow">Discussion Log</p>
+            <h2>Panel and committee back-and-forth</h2>
+            <p className="hero-copy">This keeps the human discussion only and hides system orchestration noise.</p>
+          </div>
+        </div>
+        <ol className="timeline">
+          {discussionLog.map((entry, index) => (
+            <li key={`${entry.speaker}-${index}`} className="timeline-item">
+              <div className="timeline-header">
+                <span className="timeline-stage">{renderValue(entry.section)}</span>
+                <span className="timeline-actor">{renderValue(entry.speaker)}</span>
+                <span className="timeline-time">{renderValue(entry.role)}</span>
+              </div>
+              <div className="analysis-box analysis-box-xl">{renderValue(entry.content)}</div>
+            </li>
+          ))}
+          {!discussionLog.length && <p className="muted">No committee discussion log was recorded for this report.</p>}
+        </ol>
       </section>
 
       <section className="panel">
         <div className="panel-header">
           <div>
             <p className="eyebrow">Self Review</p>
-            <h2>Suggested process improvements</h2>
-            <p className="hero-copy">
-              This section inspects the finished report and points out gaps in prompts, evidence, and orchestration.
-            </p>
+            <h2>On-demand critique of the finished report</h2>
           </div>
-          <button className="button subtle" onClick={runSelfReview} disabled={reviewBusy}>
-            {reviewBusy ? "Reviewing..." : "Run Self-Review"}
+          <button className="button subtle" onClick={() => void runSelfReview()} disabled={reviewBusy}>
+            {reviewBusy ? "Reviewing..." : "Run Self Review"}
           </button>
         </div>
-        <div className="stack">
+        {error && <p className="error-text">{error}</p>}
+        <div className="card-grid">
           {detail.self_reviews.map((review) => (
-            <div key={review.review_id} className="review-card">
-              <strong>{review.summary}</strong>
-              <p className="meta-label">{review.created_at}</p>
+            <article key={review.review_id} className="review-card">
+              <h3>{review.created_at.slice(0, 19)}</h3>
+              <ScrollableTextBlock label="Summary" text={review.summary} />
               <div className="stack compact-stack">
-                {review.recommendations.map((item, index) => (
-                  <div key={`${review.review_id}-${index}`} className="summary-card">
+                {review.recommendations.map((recommendation, index) => (
+                  <article key={`${review.review_id}-${index}`} className="summary-card">
                     <span className="meta-label">
-                      {item.category} · {item.priority}
+                      {recommendation.category} • {recommendation.priority}
                     </span>
-                    <div className="analysis-box">{item.recommendation}</div>
-                    <div className="analysis-box muted-box">{item.rationale}</div>
-                  </div>
+                    <div className="analysis-box">{recommendation.recommendation}</div>
+                    <div className="analysis-box muted-box">{recommendation.rationale}</div>
+                  </article>
                 ))}
               </div>
-            </div>
+            </article>
           ))}
-          {!detail.self_reviews.length && <p className="muted">No self-review yet.</p>}
-          {error && <p className="error-text">{error}</p>}
+          {!detail.self_reviews.length && (
+            <p className="muted">Run self-review to see prompt, data, and orchestration suggestions for this report.</p>
+          )}
         </div>
       </section>
     </>

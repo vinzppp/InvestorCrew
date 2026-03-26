@@ -93,6 +93,24 @@ class InvestorCrewTests(unittest.TestCase):
         self.assertIn("forward_pe", selection.chosen_metrics)
         self.assertIn("market_conditions", selection.lens)
 
+    def test_planning_draft_for_oklo_prioritizes_feasibility_and_runway(self) -> None:
+        plan = self.service.generate_plan("What do you think about investing in OKLO stock (nuclear company)?")
+        self.assertEqual(plan.primary_strategy, "tech_feasibility")
+        self.assertIn("runway_and_financing", plan.secondary_strategies)
+        self.assertTrue(plan.sources)
+        self.assertGreaterEqual(plan.source_count, 15)
+        self.assertIn("sec_filings", plan.source_buckets)
+        self.assertIn("industry_due_diligence", plan.prompt_pack)
+        self.assertIn("listing", plan.listing_confirmation.lower())
+        self.assertTrue(any("mechanism" in question.lower() or "runway" in question.lower() for question in plan.key_study_questions))
+        listing_refs = [source for source in plan.sources if source.bucket == "listing_reference"]
+        self.assertLess(len(listing_refs), plan.source_count)
+
+    def test_macro_planning_draft_uses_macro_regime(self) -> None:
+        plan = self.service.generate_plan("How should I think about inflation, rates, and markets today?")
+        self.assertEqual(plan.primary_strategy, "macro_regime")
+        self.assertFalse(plan.classification.needs_technology_report)
+
     def test_investor_analyses_have_six_stages(self) -> None:
         result = self.service.ask("Should I buy NVIDIA stock given AI demand and the current market setup?")
         self.assertEqual(len(result.analyses), 10)
@@ -115,12 +133,24 @@ class InvestorCrewTests(unittest.TestCase):
         self.assertLessEqual(len(result.proposals), 3)
         expected_votes = len(result.proposals) * 10
         self.assertEqual(len(result.votes), expected_votes)
+        self.assertIn(result.final_disposition, {"invest", "watchlist", "no_invest"})
+        self.assertIsNotNone(result.committee_memo)
+        self.assertTrue(result.committee_reasoning)
+        self.assertTrue(result.discussion_log)
 
     def test_result_serializes_to_json(self) -> None:
         result = self.service.ask("Should I buy JPM stock?")
         payload = result.to_dict()
         self.assertEqual(payload["classification"]["category"], "stock")
         json.dumps(payload)
+
+    def test_under_sourced_technology_run_blocks_before_investors(self) -> None:
+        result = self.service.ask("Should I buy QAIT stock, an AI company with breakthrough technology?")
+        self.assertEqual(result.final_disposition, "no_invest")
+        self.assertTrue(result.technical_review_rounds)
+        self.assertFalse(result.technical_review_rounds[-1].passes)
+        self.assertFalse(result.analyses)
+        self.assertFalse(result.proposals)
 
     def test_unknown_stock_question_creates_placeholder_fixture(self) -> None:
         placeholder_path = self.data_dir / "fixtures" / "companies" / "oklo.json"
@@ -151,6 +181,7 @@ class InvestorCrewTests(unittest.TestCase):
         self.assertTrue(result.saved_markdown_path)
         self.assertTrue(Path(result.saved_markdown_path or "").exists())
         self.assertTrue(result.transcript)
+        self.assertIsNotNone(result.planning_draft)
 
         run = self.service.get_run(result.run_id or "")
         self.assertEqual(run["status"], "COMPLETED")
@@ -254,6 +285,32 @@ class InvestorCrewTests(unittest.TestCase):
             self.assertEqual(companies.status_code, 200)
             self.assertTrue(any(item["ticker"] == "NVDA" for item in companies.json()["items"]))
 
+            plan = client.post("/api/plans", json={"question": "Should I buy OKLO stock?", "context": ""})
+            self.assertEqual(plan.status_code, 200)
+            plan_payload = plan.json()
+            self.assertEqual(plan_payload["primary_strategy"], "tech_feasibility")
+            self.assertIn("industry_due_diligence", plan_payload["prompt_pack"])
+            self.assertGreaterEqual(plan_payload["source_count"], 15)
+
+            updated_plan = client.put(
+                f"/api/plans/{plan_payload['plan_id']}",
+                json={"payload": {"asset_overview": "Custom reviewed overview"}}
+            )
+            self.assertEqual(updated_plan.status_code, 200)
+            self.assertEqual(updated_plan.json()["asset_overview"], "Custom reviewed overview")
+
+            approved = client.post(f"/api/plans/{plan_payload['plan_id']}/approve")
+            self.assertEqual(approved.status_code, 200)
+            run = approved.json()
+
+            status = run["status"]
+            for _ in range(80):
+                if status in {"COMPLETED", "FAILED"}:
+                    break
+                time.sleep(0.05)
+                status = client.get(f"/api/runs/{run['id']}").json()["status"]
+            self.assertEqual(status, "COMPLETED")
+
             created = client.post("/api/runs", json={"question": "Should I buy JPM stock?", "context": ""})
             self.assertEqual(created.status_code, 200)
             run = created.json()
@@ -273,6 +330,7 @@ class InvestorCrewTests(unittest.TestCase):
             report = client.get(f"/api/reports/{run['id']}")
             self.assertEqual(report.status_code, 200)
             self.assertTrue(report.json()["run"]["final_result"])
+            self.assertTrue(report.json()["run"]["final_result"]["committee_memo"])
 
             review = client.post(f"/api/reports/{run['id']}/self-review")
             self.assertEqual(review.status_code, 200)

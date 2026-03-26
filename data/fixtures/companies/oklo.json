@@ -15,7 +15,14 @@
   "technology": {
     "summary": "Oklo is building advanced fission reactors and a fuel recycling strategy intended to supply compact, reliable nuclear power at customer sites.",
     "world_impact": "If commercialized, the platform could offer firm low-carbon power for AI data centers, defense, and industrial facilities that need 24/7 energy.",
+    "scientific_mechanism": "The thesis depends on whether Oklo can translate advanced fission reactor design and fuel-cycle know-how into a licensable, repeatable onsite power system.",
+    "proof_status": "Conceptual and development-stage proof exists, but commercial proof at sustained operating scale remains outstanding.",
     "feasibility": "Moderate. The technical vision is plausible, but licensing, reactor deployment, manufacturing scale, and execution timing remain major hurdles.",
+    "engineering_bottlenecks": [
+      "Licensing the first commercial design and site",
+      "Building repeatable reactor manufacturing and fuel logistics",
+      "Proving that early projects can reach durable uptime and cost targets"
+    ],
     "requirements": [
       "Nuclear regulatory approvals",
       "Project financing and customer commitments",
@@ -36,6 +43,43 @@
     ],
     "preferred_technology": "Advanced fission reactors with high-capacity-factor onsite power",
     "preferred_rationale": "The attraction is reliable carbon-free power for energy-hungry customers, but the thesis only works if licensing and deployment execution hold.",
+    "cost_curve": "The long-term appeal is 24/7 clean power for energy-intensive customers, but the near-term cost curve still depends on first-project execution and financing terms.",
+    "timeline": "The key timeline is first commercial deployment, then proof that early reactors can operate reliably enough to unlock broader adoption.",
+    "regulatory_path": "Regulatory approval is a gating variable rather than a routine step; it should be treated as one of the primary milestones in the investment case.",
+    "manufacturing_dependencies": [
+      "Specialized nuclear supply chain partners",
+      "Fuel-cycle readiness",
+      "Project delivery and site construction execution"
+    ],
+    "capital_intensity": "High before revenue scale. Oklo must fund engineering, licensing, project development, and early deployment before mature cash generation exists.",
+    "failure_modes": [
+      "The first commercial reactor slips materially beyond the planned timeline",
+      "Capital needs force repeated dilution before operating proof exists",
+      "Alternative power solutions satisfy customer demand faster or more cheaply"
+    ],
+    "sources": [
+      {
+        "title": "Oklo investor materials",
+        "url": "https://www.oklo.com",
+        "publisher": "Oklo",
+        "published_at": "2026-01-21",
+        "snippet": "Company materials frame Oklo around advanced fission power plants and fuel recycling for reliable onsite clean power."
+      },
+      {
+        "title": "Oklo quote page",
+        "url": "https://finance.yahoo.com/quote/OKLO/",
+        "publisher": "Yahoo Finance",
+        "published_at": "2026-01-21",
+        "snippet": "Yahoo Finance reflected Oklo as a public, pre-revenue company with a sizable market cap and visible balance-sheet cash."
+      },
+      {
+        "title": "MarketWatch coverage on Oklo expectations",
+        "url": "https://www.marketwatch.com",
+        "publisher": "MarketWatch",
+        "published_at": "2026-01-21",
+        "snippet": "MarketWatch emphasized how much of the Oklo thesis still depends on commercialization timing and expectations."
+      }
+    ],
     "open_unknowns": [
       "When the first commercial reactor actually reaches sustained operation",
       "How much dilution is required before steady-state cash generation",
@@ -68,6 +112,15 @@
       "meta_power_campus_gw": 1.2,
       "employees": 120
     },
+    "sources": [
+      {
+        "title": "OKLO stock page",
+        "url": "https://robinhood.com/us/en/stocks/OKLO/",
+        "publisher": "Robinhood",
+        "published_at": "2026-01-21",
+        "snippet": "Robinhood confirmed OKLO as an actively listed public equity."
+      }
+    ],
     "commentary": "Yahoo Finance's 2026-01-21 page showed a 14.184B market cap, 11.66x price-to-book, and no TTM revenue. MarketWatch characterized Oklo as a pre-revenue nuclear company whose revenue is not expected until late 2027."
   }
 }

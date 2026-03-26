@@ -16,6 +16,8 @@ from investorcrew.models import (
     InvestorProfile,
     ReportEvent,
     RunResult,
+    PlanningDraft,
+    PlanningSource,
     SelfReview,
     SelfReviewRecommendation,
 )
@@ -142,6 +144,20 @@ class SqliteStore:
                     previous_value_json TEXT,
                     new_value_json TEXT NOT NULL,
                     created_at TEXT NOT NULL
+                );
+                CREATE TABLE IF NOT EXISTS planning_drafts (
+                    id TEXT PRIMARY KEY,
+                    question TEXT NOT NULL,
+                    context TEXT NOT NULL,
+                    status TEXT NOT NULL,
+                    company_ticker TEXT,
+                    company_name TEXT,
+                    classification_json TEXT NOT NULL,
+                    draft_json TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    updated_at TEXT NOT NULL,
+                    approved_at TEXT,
+                    run_id TEXT
                 );
                 CREATE TABLE IF NOT EXISTS runs (
                     id TEXT PRIMARY KEY,
@@ -455,6 +471,83 @@ class SqliteStore:
                     json.dumps(new_value),
                     _now(),
                 ),
+            )
+
+    def save_planning_draft(self, draft: PlanningDraft) -> None:
+        timestamp = _now()
+        payload = asdict(draft)
+        with self.connect() as connection:
+            existing = connection.execute("SELECT created_at FROM planning_drafts WHERE id = ?", (draft.plan_id,)).fetchone()
+            created_at = existing["created_at"] if existing else timestamp
+            connection.execute(
+                """
+                INSERT INTO planning_drafts (
+                    id, question, context, status, company_ticker, company_name, classification_json,
+                    draft_json, created_at, updated_at, approved_at, run_id
+                )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(id) DO UPDATE SET
+                    question = excluded.question,
+                    context = excluded.context,
+                    status = excluded.status,
+                    company_ticker = excluded.company_ticker,
+                    company_name = excluded.company_name,
+                    classification_json = excluded.classification_json,
+                    draft_json = excluded.draft_json,
+                    updated_at = excluded.updated_at,
+                    approved_at = excluded.approved_at,
+                    run_id = excluded.run_id
+                """,
+                (
+                    draft.plan_id,
+                    draft.question,
+                    draft.context,
+                    draft.status,
+                    draft.company_ticker,
+                    draft.company_name,
+                    json.dumps(asdict(draft.classification)),
+                    json.dumps(payload),
+                    created_at,
+                    timestamp,
+                    draft.approved_at,
+                    draft.run_id,
+                ),
+            )
+
+    def get_planning_draft(self, plan_id: str) -> dict[str, Any]:
+        with self.connect() as connection:
+            row = connection.execute("SELECT * FROM planning_drafts WHERE id = ?", (plan_id,)).fetchone()
+        if row is None:
+            raise KeyError(f"Unknown planning draft: {plan_id}")
+        payload = dict(row)
+        payload["classification"] = json.loads(row["classification_json"])
+        payload["draft"] = json.loads(row["draft_json"])
+        return payload
+
+    def update_planning_draft(self, plan_id: str, payload: dict[str, Any]) -> dict[str, Any]:
+        current = self.get_planning_draft(plan_id)
+        draft = current["draft"]
+        merged = {
+            **draft,
+            **payload,
+        }
+        if "classification" not in merged:
+            merged["classification"] = draft["classification"]
+        merged["plan_id"] = plan_id
+        if payload.get("prompt_pack"):
+            merged["prompt_pack"] = {**draft.get("prompt_pack", {}), **payload["prompt_pack"]}
+        self.save_planning_draft(self._planning_draft_from_raw(merged))
+        return self.get_planning_draft(plan_id)
+
+    def link_plan_to_run(self, plan_id: str, run_id: str, approved_at: str) -> None:
+        with self.connect() as connection:
+            connection.execute(
+                """
+                UPDATE planning_drafts
+                SET status = 'APPROVED', approved_at = ?, run_id = ?, updated_at = ?
+                WHERE id = ?
+                """,
+                (approved_at, run_id, _now(), plan_id),
             )
 
     def create_run(self, question: str, context: str) -> str:
@@ -856,4 +949,52 @@ class SqliteStore:
             description=raw["description"],
             technology=dict(raw["technology"]),
             stock=dict(raw["stock"]),
+        )
+
+    def _planning_draft_from_raw(self, raw: dict[str, Any]) -> PlanningDraft:
+        classification_raw = raw["classification"]
+        sources = [
+            PlanningSource(
+                title=item["title"],
+                url=item["url"],
+                publisher=item["publisher"],
+                published_at=item.get("published_at"),
+                snippet=item["snippet"],
+                bucket=item.get("bucket", ""),
+                source_kind=item.get("source_kind", "core"),
+            )
+            for item in raw.get("sources", [])
+        ]
+        from investorcrew.models import QuestionClassification
+
+        return PlanningDraft(
+            plan_id=raw["plan_id"],
+            question=raw["question"],
+            context=raw.get("context", ""),
+            status=raw["status"],
+            classification=QuestionClassification(**classification_raw),
+            asset_overview=raw["asset_overview"],
+            company_ticker=raw.get("company_ticker"),
+            company_name=raw.get("company_name"),
+            primary_strategy=raw["primary_strategy"],
+            secondary_strategies=list(raw.get("secondary_strategies", [])),
+            strategy_rationale=raw["strategy_rationale"],
+            key_study_questions=list(raw.get("key_study_questions", [])),
+            source_count=int(raw.get("source_count", len(sources))),
+            source_buckets=dict(raw.get("source_buckets", {})),
+            coverage_gaps=list(raw.get("coverage_gaps", [])),
+            listing_confirmation=raw.get("listing_confirmation", ""),
+            industry_summary=raw.get("industry_summary", ""),
+            leadership_summary=raw.get("leadership_summary", ""),
+            shareholder_summary=raw.get("shareholder_summary", ""),
+            strategy_summary=raw.get("strategy_summary", ""),
+            product_summary=raw.get("product_summary", ""),
+            customer_summary=raw.get("customer_summary", ""),
+            competitive_landscape_summary=raw.get("competitive_landscape_summary", ""),
+            prompt_pack=dict(raw.get("prompt_pack", {})),
+            sources=sources,
+            research_mode=raw.get("research_mode", "local_only"),
+            approval_warning=raw.get("approval_warning"),
+            approved_at=raw.get("approved_at"),
+            run_id=raw.get("run_id"),
         )

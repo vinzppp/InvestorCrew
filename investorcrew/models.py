@@ -84,18 +84,72 @@ class MetricSelection:
 
 
 @dataclass(slots=True)
+class PlanningSource:
+    title: str
+    url: str
+    publisher: str
+    published_at: str | None
+    snippet: str
+    bucket: str = ""
+    source_kind: str = "core"
+
+
+@dataclass(slots=True)
+class PlanningDraft:
+    plan_id: str
+    question: str
+    context: str
+    status: str
+    classification: QuestionClassification
+    asset_overview: str
+    company_ticker: str | None
+    company_name: str | None
+    primary_strategy: str
+    secondary_strategies: list[str]
+    strategy_rationale: str
+    key_study_questions: list[str]
+    source_count: int
+    source_buckets: dict[str, int]
+    coverage_gaps: list[str]
+    listing_confirmation: str
+    industry_summary: str
+    leadership_summary: str
+    shareholder_summary: str
+    strategy_summary: str
+    product_summary: str
+    customer_summary: str
+    competitive_landscape_summary: str
+    prompt_pack: dict[str, str]
+    sources: list[PlanningSource]
+    research_mode: str
+    approval_warning: str | None = None
+    approved_at: str | None = None
+    run_id: str | None = None
+
+
+@dataclass(slots=True)
 class TechnicalDueDiligenceReport:
     subject: str
     selected_dimensions: list[str]
     summary: str
     what_it_is: str
     world_impact: str
+    scientific_mechanism: str
+    proof_status: str
     feasibility: str
+    engineering_bottlenecks: list[str]
     requirements: list[str]
     constraints: list[str]
     competitive_landscape: list[str]
     preferred_technology: str
     preferred_rationale: str
+    cost_curve: str
+    timeline: str
+    regulatory_path: str
+    manufacturing_dependencies: list[str]
+    capital_intensity: str
+    failure_modes: list[str]
+    citations: list[PlanningSource]
     open_unknowns: list[str]
 
 
@@ -134,6 +188,20 @@ class EconomicOverviewReport:
 
 
 @dataclass(slots=True)
+class IndustryDueDiligenceReport:
+    subject: str
+    summary: str
+    market_size: str
+    market_structure: str
+    growth_drivers: list[str]
+    competitors: list[str]
+    opportunities: list[str]
+    risks: list[str]
+    customer_overview: str
+    citations: list[PlanningSource]
+
+
+@dataclass(slots=True)
 class InfoRequest:
     requestor: str
     team: str
@@ -162,6 +230,7 @@ class CrossExamination:
     respondent: str
     challenge: str
     response: str
+    committee_commentary: str = ""
 
 
 @dataclass(slots=True)
@@ -213,12 +282,47 @@ class SelfReview:
 
 
 @dataclass(slots=True)
+class TechnicalReviewRound:
+    round_index: int
+    passes: bool
+    blocked: bool
+    overall_score: float
+    depth_score: float
+    evidence_quality_score: float
+    feasibility_reasoning_score: float
+    competitive_analysis_score: float
+    clarity_score: float
+    summary: str
+    findings: list[str]
+    required_revisions: list[str]
+
+
+@dataclass(slots=True)
+class DiscussionEntry:
+    speaker: str
+    role: str
+    section: str
+    content: str
+
+
+@dataclass(slots=True)
+class CommitteeMemo:
+    thesis: str
+    opportunities: list[str]
+    risks: list[str]
+    weighing: str
+    conclusion: str
+    disposition: str
+
+
+@dataclass(slots=True)
 class DueDiligencePacket:
     classification: QuestionClassification
     metric_selections: list[MetricSelection]
     technical_report: TechnicalDueDiligenceReport | None
     stock_report: StockDueDiligenceReport | None
     economic_report: EconomicOverviewReport | None
+    industry_report: IndustryDueDiligenceReport | None
     supplemental_notes: list[str] = field(default_factory=list)
 
 
@@ -227,12 +331,19 @@ class RunResult:
     question: str
     context: str
     classification: QuestionClassification
+    planning_draft: PlanningDraft | None
     diligence_packet: DueDiligencePacket
+    technical_review_rounds: list[TechnicalReviewRound]
     analyses: list[InvestorAnalysis]
     cross_examinations: list[CrossExamination]
+    committee_memo: CommitteeMemo | None
+    committee_reasoning: list[str]
+    discussion_log: list[DiscussionEntry]
     proposals: list[Proposal]
     votes: list[VoteRecord]
     follow_up_rounds_used: int
+    final_disposition: str = "watchlist"
+    blocked_reason: str | None = None
     run_id: str | None = None
     prompt_snapshot: dict[str, str] = field(default_factory=dict)
     transcript: list[ReportEvent] = field(default_factory=list)

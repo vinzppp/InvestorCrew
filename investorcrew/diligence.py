@@ -6,7 +6,10 @@ from investorcrew.data_store import KnowledgeBase
 from investorcrew.models import (
     CompanyRecord,
     EconomicOverviewReport,
+    IndustryDueDiligenceReport,
     MetricSelection,
+    PlanningDraft,
+    PlanningSource,
     StockDueDiligenceReport,
     TechnicalDueDiligenceReport,
 )
@@ -67,6 +70,8 @@ def build_technical_due_diligence(
     question: str,
     company: CompanyRecord | None,
     metric_selection: MetricSelection,
+    planning_draft: PlanningDraft,
+    sources: list[PlanningSource],
     llm_client: LLMClient,
 ) -> TechnicalDueDiligenceReport:
     subject = company.name if company else question.strip()
@@ -77,6 +82,8 @@ def build_technical_due_diligence(
             technology.get("summary", "Technology scope must be inferred from the prompt."),
             technology.get("world_impact", "Potential impact depends on adoption and real customer pain points."),
             technology.get("feasibility", "Feasibility remains uncertain without stronger engineering evidence."),
+            technology.get("scientific_mechanism", "The scientific mechanism should be made explicit."),
+            technology.get("proof_status", "The proof status is unclear."),
             technology.get("preferred_rationale", "The preferred approach should balance performance with deployment practicality."),
         ],
     )
@@ -86,12 +93,55 @@ def build_technical_due_diligence(
         summary=summary,
         what_it_is=technology.get("summary", f"The question references {subject}, but the technology stack was not in the fixture set."),
         world_impact=technology.get("world_impact", "If execution succeeds, the technology could reshape a meaningful workflow or cost curve."),
+        scientific_mechanism=technology.get(
+            "scientific_mechanism",
+            f"The core mechanism should be understood through the lens of {planning_draft.primary_strategy.replace('_', ' ')} before assuming commercialization works.",
+        ),
+        proof_status=technology.get(
+            "proof_status",
+            "Prototype-level proof appears incomplete or not yet well documented in the local knowledge base.",
+        ),
         feasibility=technology.get("feasibility", "The build path is plausible but requires more proof on scale, talent, and economics."),
+        engineering_bottlenecks=list(
+            technology.get(
+                "engineering_bottlenecks",
+                ["Scale-up risk", "Manufacturing readiness", "Customer deployment validation"],
+            )
+        ),
         requirements=list(technology.get("requirements", ["Domain expertise", "Capital", "Distribution"])),
         constraints=list(technology.get("constraints", ["Execution risk", "Adoption risk"])),
         competitive_landscape=list(technology.get("competitor_technologies", ["Competing approaches need to be mapped."])),
         preferred_technology=technology.get("preferred_technology", "No preferred technology selected yet"),
         preferred_rationale=technology.get("preferred_rationale", "There is not enough data to prefer one technical approach with high confidence."),
+        cost_curve=technology.get(
+            "cost_curve",
+            "Cost competitiveness is not yet proven enough in the current fixture data and should be treated as an open diligence item.",
+        ),
+        timeline=technology.get(
+            "timeline",
+            "The timeline should be separated into proof, regulatory, manufacturing, and commercial milestones before trusting a single target date.",
+        ),
+        regulatory_path=technology.get(
+            "regulatory_path",
+            "Regulatory and qualification gating items still need to be mapped explicitly.",
+        ),
+        manufacturing_dependencies=list(
+            technology.get(
+                "manufacturing_dependencies",
+                ["Specialized suppliers", "Long-lead components", "Execution coordination across counterparties"],
+            )
+        ),
+        capital_intensity=technology.get(
+            "capital_intensity",
+            "Capital intensity appears meaningful and needs to be judged against available runway and financing risk.",
+        ),
+        failure_modes=list(
+            technology.get(
+                "failure_modes",
+                ["Timeline slips", "Commercial costs stay too high", "A competing solution solves the customer problem faster"],
+            )
+        ),
+        citations=sources,
         open_unknowns=list(technology.get("open_unknowns", ["Unit economics at scale remain uncertain."])),
     )
 
@@ -123,6 +173,71 @@ def build_stock_due_diligence(
         cheap_or_expensive=f"{live_company.name} screens as {valuation_bucket}; {commentary}",
         missing_metrics=missing_metrics,
         open_unknowns=[f"Missing metric: {metric}" for metric in missing_metrics],
+    )
+
+
+def build_industry_due_diligence(
+    question: str,
+    company: CompanyRecord | None,
+    planning_draft: PlanningDraft,
+    sources: list[PlanningSource],
+    llm_client: LLMClient,
+) -> IndustryDueDiligenceReport:
+    subject = company.name if company else question.strip()
+    summary = llm_client.summarize(
+        f"Industry diligence for {subject}",
+        [
+            planning_draft.industry_summary,
+            planning_draft.competitive_landscape_summary,
+            planning_draft.customer_summary,
+            planning_draft.strategy_summary,
+        ],
+    )
+    competitors = company.technology.get("competitor_technologies", []) if company else []
+    opportunities = []
+    if company and company.is_tech:
+        opportunities.append("If the product works as claimed, the company could benefit from a structural technology adoption wave.")
+    opportunities.append("Industry demand could be durable if customers treat the problem as mission-critical rather than discretionary.")
+    if planning_draft.primary_strategy == "market_winner":
+        opportunities.append("A category winner can compound faster than the industry if distribution or ecosystem advantages persist.")
+
+    risks = []
+    if company:
+        risks.extend(company.technology.get("constraints", [])[:3])
+    if not risks:
+        risks = [
+            "Competitive intensity may compress margins or prolong customer adoption cycles.",
+            "Industry growth could undershoot the expectations embedded in the thesis.",
+        ]
+
+    growth_drivers = [
+        "Customer demand intensity",
+        "Relative product advantage versus substitutes",
+        "Capital availability and deployment cadence",
+    ]
+    if company and company.is_tech:
+        growth_drivers.insert(0, "Commercial proof of the technology and its deployment economics")
+
+    market_size = (
+        f"Planning should treat {company.industry if company else 'the industry'} as a real market-sizing exercise rather than a narrative shortcut."
+    )
+    market_structure = (
+        "Focus on incumbents, substitutes, supplier power, customer concentration, switching costs, and regulatory barriers before assuming durable economics."
+    )
+    customer_overview = planning_draft.customer_summary
+
+    filtered_sources = [source for source in sources if source.bucket in {"industry_research", "company_website", "transcripts"}]
+    return IndustryDueDiligenceReport(
+        subject=subject,
+        summary=summary,
+        market_size=market_size,
+        market_structure=market_structure,
+        growth_drivers=growth_drivers,
+        competitors=[str(item) for item in competitors] or ["Competitive mapping still needs to be expanded."],
+        opportunities=opportunities[:4],
+        risks=[str(item) for item in risks][:4],
+        customer_overview=customer_overview,
+        citations=filtered_sources or sources[:6],
     )
 
 

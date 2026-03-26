@@ -17,6 +17,16 @@ class RunCreateRequest(BaseModel):
     context: str = ""
 
 
+class PlanCreateRequest(BaseModel):
+    question: str = Field(..., min_length=1)
+    context: str = ""
+    research_mode: str | None = None
+
+
+class PlanUpdateRequest(BaseModel):
+    payload: dict[str, Any]
+
+
 class PromptUpdateRequest(BaseModel):
     content: str
     label: str | None = None
@@ -47,9 +57,9 @@ def create_app() -> FastAPI:
 
     service = InvestorCrewService()
 
-    def _run_in_background(run_id: str, question: str, context: str) -> None:
+    def _run_in_background(run_id: str, question: str, context: str, planning_draft: Any) -> None:
         def worker() -> None:
-            service.execute_run(question=question, context=context, run_id=run_id)
+            service.execute_run(question=question, context=context, run_id=run_id, planning_draft=planning_draft)
 
         thread = threading.Thread(target=worker, daemon=True)
         thread.start()
@@ -58,10 +68,41 @@ def create_app() -> FastAPI:
     def health() -> dict[str, str]:
         return {"status": "ok"}
 
+    @app.post("/api/plans")
+    def create_plan(request: PlanCreateRequest) -> dict[str, Any]:
+        return service.create_plan(
+            question=request.question,
+            context=request.context,
+            research_mode=request.research_mode,
+        )
+
+    @app.get("/api/plans/{plan_id}")
+    def get_plan(plan_id: str) -> dict[str, Any]:
+        try:
+            return service.get_plan(plan_id)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    @app.put("/api/plans/{plan_id}")
+    def update_plan(plan_id: str, request: PlanUpdateRequest) -> dict[str, Any]:
+        try:
+            return service.update_plan(plan_id, request.payload)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    @app.post("/api/plans/{plan_id}/approve")
+    def approve_plan(plan_id: str) -> dict[str, Any]:
+        try:
+            run, approved_draft = service.approve_plan(plan_id)
+        except KeyError as exc:
+            raise HTTPException(status_code=404, detail=str(exc)) from exc
+        _run_in_background(run["id"], run["question"], run["context"], approved_draft)
+        return run
+
     @app.post("/api/runs")
     def create_run(request: RunCreateRequest) -> dict[str, Any]:
-        run_id = service.create_run(question=request.question, context=request.context)
-        _run_in_background(run_id, request.question, request.context)
+        run_id, approved_draft = service.queue_run(question=request.question, context=request.context)
+        _run_in_background(run_id, request.question, request.context, approved_draft)
         return service.get_run(run_id)
 
     @app.get("/api/runs/{run_id}")

@@ -1,5 +1,47 @@
 export type RunStatus = "QUEUED" | "RUNNING" | "COMPLETED" | "FAILED";
 
+export interface PlanningSource {
+  title: string;
+  url: string;
+  publisher: string;
+  published_at: string | null;
+  snippet: string;
+  bucket: string;
+  source_kind: string;
+}
+
+export interface PlanningDraft {
+  plan_id: string;
+  question: string;
+  context: string;
+  status: string;
+  classification: Record<string, unknown>;
+  asset_overview: string;
+  company_ticker: string | null;
+  company_name: string | null;
+  primary_strategy: string;
+  secondary_strategies: string[];
+  strategy_rationale: string;
+  key_study_questions: string[];
+  source_count: number;
+  source_buckets: Record<string, number>;
+  coverage_gaps: string[];
+  listing_confirmation: string;
+  industry_summary: string;
+  leadership_summary: string;
+  shareholder_summary: string;
+  strategy_summary: string;
+  product_summary: string;
+  customer_summary: string;
+  competitive_landscape_summary: string;
+  prompt_pack: Record<string, string>;
+  sources: PlanningSource[];
+  research_mode: string;
+  approval_warning: string | null;
+  approved_at: string | null;
+  run_id: string | null;
+}
+
 export interface CompanySummary {
   id: string;
   ticker: string;

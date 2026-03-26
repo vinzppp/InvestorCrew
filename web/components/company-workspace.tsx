@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
-import { getCompany, updateCompany } from "@/lib/api";
-import { CompanyDetail, CompanyRecordPayload, ReportSummary } from "@/lib/types";
+import { getCompany } from "@/lib/api";
+import { CompanyDetail, ReportSummary } from "@/lib/types";
 
 function groupReportsByDate(reports: ReportSummary[]): Record<string, ReportSummary[]> {
   return reports.reduce<Record<string, ReportSummary[]>>((groups, report) => {
@@ -14,111 +14,192 @@ function groupReportsByDate(reports: ReportSummary[]): Record<string, ReportSumm
   }, {});
 }
 
+function renderMetricList(metrics: Record<string, unknown>): string {
+  const entries = Object.entries(metrics);
+  if (!entries.length) return "No curated metrics in the current company record.";
+  return entries.map(([key, value]) => `${key}: ${String(value)}`).join("\n");
+}
+
+function renderSourceLibrary(company: CompanyDetail["company"]): Array<{
+  title: string;
+  publisher: string;
+  published_at: string | null;
+  url: string;
+  snippet: string;
+}> {
+  const technologySources = Array.isArray(company.technology.sources)
+    ? (company.technology.sources as Array<Record<string, unknown>>)
+    : [];
+  const stockSources = Array.isArray(company.stock.sources)
+    ? (company.stock.sources as Array<Record<string, unknown>>)
+    : [];
+  return [...technologySources, ...stockSources].map((source) => ({
+    title: String(source.title ?? company.name),
+    publisher: String(source.publisher ?? "Source"),
+    published_at: source.published_at ? String(source.published_at) : null,
+    url: String(source.url ?? ""),
+    snippet: String(source.snippet ?? source.note ?? "Source note unavailable.")
+  }));
+}
+
 export function CompanyWorkspace({ companyId }: { companyId: string }) {
   const [detail, setDetail] = useState<CompanyDetail | null>(null);
-  const [draft, setDraft] = useState<CompanyRecordPayload | null>(null);
-  const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     void getCompany(companyId)
       .then((nextDetail) => {
         setDetail(nextDetail);
-        setDraft(nextDetail.company);
       })
       .catch((caught) => setError(caught instanceof Error ? caught.message : "Failed to load company"));
   }, [companyId]);
 
   const groupedReports = useMemo(() => groupReportsByDate(detail?.reports ?? []), [detail]);
 
-  async function saveCompany() {
-    if (!draft) return;
-    setSaving(true);
-    setError(null);
-    try {
-      await updateCompany(companyId, draft as unknown as Record<string, unknown>);
-      const refreshed = await getCompany(companyId);
-      setDetail(refreshed);
-      setDraft(refreshed.company);
-    } catch (caught) {
-      setError(caught instanceof Error ? caught.message : "Failed to save company");
-    } finally {
-      setSaving(false);
-    }
+  if (!detail) {
+    return (
+      <section className="panel panel-large">
+        <p className="muted">Loading company workspace...</p>
+      </section>
+    );
   }
 
-  if (!detail || !draft) {
-    return <section className="panel panel-large"><p className="muted">Loading company workspace...</p></section>;
-  }
+  const company = detail.company;
+  const sourceLibrary = renderSourceLibrary(company);
+  const productSummary = String(company.technology.summary ?? company.description);
+  const customerSummary =
+    Object.keys(company.stock.segment_mix ?? {}).length > 0
+      ? Object.entries(company.stock.segment_mix as Record<string, unknown>)
+          .map(([segment, weight]) => `${segment}: ${String(weight)}`)
+          .join("\n")
+      : String(company.technology.world_impact ?? "Customer coverage has not been richly curated for this company yet.");
+  const competition = Array.isArray(company.technology.competitor_technologies)
+    ? (company.technology.competitor_technologies as Array<unknown>).map(String).join("\n")
+    : "Competitive landscape is not richly curated in this company record yet.";
 
   return (
     <>
       <section className="panel panel-large">
         <div className="panel-header">
           <div>
-            <p className="eyebrow">{draft.ticker}</p>
-            <h2>{draft.name}</h2>
+            <p className="eyebrow">{company.ticker}</p>
+            <h2>{company.name}</h2>
+            <p className="hero-copy">{company.description}</p>
           </div>
-          <span className="status-pill neutral">{draft.archetype}</span>
+          <span className="status-pill neutral">{company.archetype}</span>
         </div>
-        <div className="stack">
-          <label className="field">
-            <span>Description</span>
-            <textarea
-              value={draft.description}
-              onChange={(event) => setDraft({ ...draft, description: event.target.value })}
-              rows={5}
-            />
-          </label>
-          <div className="split-fields">
-            <label className="field">
-              <span>Sector</span>
-              <input value={draft.sector} onChange={(event) => setDraft({ ...draft, sector: event.target.value })} />
-            </label>
-            <label className="field">
-              <span>Industry</span>
-              <input value={draft.industry} onChange={(event) => setDraft({ ...draft, industry: event.target.value })} />
-            </label>
-            <label className="field">
-              <span>Archetype</span>
-              <input value={draft.archetype} onChange={(event) => setDraft({ ...draft, archetype: event.target.value })} />
-            </label>
-          </div>
-          <label className="field">
-            <span>Technology JSON</span>
-            <textarea
-              value={JSON.stringify(draft.technology, null, 2)}
-              onChange={(event) => {
-                try {
-                  setDraft({ ...draft, technology: JSON.parse(event.target.value) });
-                } catch {
-                  // Let invalid JSON sit in the textarea until the user fixes it.
-                }
-              }}
-              rows={12}
-            />
-          </label>
-          <label className="field">
-            <span>Stock JSON</span>
-            <textarea
-              value={JSON.stringify(draft.stock, null, 2)}
-              onChange={(event) => {
-                try {
-                  setDraft({ ...draft, stock: JSON.parse(event.target.value) });
-                } catch {
-                  // Let invalid JSON sit in the textarea until the user fixes it.
-                }
-              }}
-              rows={14}
-            />
-          </label>
-          <div className="actions">
-            <button className="button primary" onClick={saveCompany} disabled={saving}>
-              {saving ? "Saving..." : "Save Company"}
-            </button>
-          </div>
-          {error && <p className="error-text">{error}</p>}
+
+        <div className="section-grid">
+          <article className="summary-card">
+            <span className="meta-label">Overview</span>
+            <div className="analysis-box analysis-box-tall">{company.description}</div>
+          </article>
+          <article className="summary-card">
+            <span className="meta-label">Industry Snapshot</span>
+            <div className="analysis-box analysis-box-tall">
+              Sector: {company.sector}
+              {"\n"}
+              Industry: {company.industry}
+              {"\n"}
+              Archetype: {company.archetype}
+            </div>
+          </article>
+          <article className="summary-card">
+            <span className="meta-label">Products And Technology</span>
+            <div className="analysis-box analysis-box-tall">{productSummary}</div>
+          </article>
+          <article className="summary-card">
+            <span className="meta-label">Customers And Go-To-Market</span>
+            <div className="analysis-box analysis-box-tall">{customerSummary}</div>
+          </article>
+          <article className="summary-card">
+            <span className="meta-label">Leadership</span>
+            <div className="analysis-box analysis-box-tall">
+              Leadership detail should be checked through proxy filings, investor materials, and leadership interviews.
+            </div>
+          </article>
+          <article className="summary-card">
+            <span className="meta-label">Shareholders</span>
+            <div className="analysis-box analysis-box-tall">
+              Shareholder detail should be checked through governance filings, financing history, and major-holder disclosures.
+            </div>
+          </article>
+          <article className="summary-card">
+            <span className="meta-label">Strategy And Priorities</span>
+            <div className="analysis-box analysis-box-tall">
+              {String(company.technology.preferred_rationale ?? company.technology.feasibility ?? company.description)}
+            </div>
+          </article>
+          <article className="summary-card">
+            <span className="meta-label">Competitive Landscape</span>
+            <div className="analysis-box analysis-box-tall">{competition}</div>
+          </article>
         </div>
+      </section>
+
+      <section className="panel">
+        <div className="panel-header">
+          <div>
+            <p className="eyebrow">Key Metrics</p>
+            <h2>Stock and valuation snapshot</h2>
+          </div>
+        </div>
+        <div className="card-grid">
+          <article className="content-card">
+            <h3>Operating Metrics</h3>
+            <div className="analysis-box analysis-box-tall">
+              {renderMetricList((company.stock.operating_metrics as Record<string, unknown>) ?? {})}
+            </div>
+          </article>
+          <article className="content-card">
+            <h3>Valuation Metrics</h3>
+            <div className="analysis-box analysis-box-tall">
+              {renderMetricList((company.stock.valuation_metrics as Record<string, unknown>) ?? {})}
+            </div>
+          </article>
+          <article className="content-card">
+            <h3>Balance Sheet</h3>
+            <div className="analysis-box analysis-box-tall">
+              {renderMetricList((company.stock.balance_sheet_metrics as Record<string, unknown>) ?? {})}
+            </div>
+          </article>
+          <article className="content-card">
+            <h3>Supplemental Metrics</h3>
+            <div className="analysis-box analysis-box-tall">
+              {renderMetricList((company.stock.supplemental_metrics as Record<string, unknown>) ?? {})}
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section className="panel">
+        <div className="panel-header">
+          <div>
+            <p className="eyebrow">Source Library</p>
+            <h2>Curated company reference points</h2>
+          </div>
+        </div>
+        {sourceLibrary.length ? (
+          <div className="card-grid">
+            {sourceLibrary.map((source, index) => (
+              <article key={`${source.title}-${index}`} className="content-card">
+                <h3>{source.title}</h3>
+                <p className="meta-label">
+                  {source.publisher}
+                  {source.published_at ? ` • ${source.published_at}` : ""}
+                </p>
+                <div className="analysis-box analysis-box-tall">{source.snippet}</div>
+                {source.url && (
+                  <a className="inline-link" href={source.url} target="_blank" rel="noreferrer">
+                    Open source
+                  </a>
+                )}
+              </article>
+            ))}
+          </div>
+        ) : (
+          <p className="muted">No source library is stored for this company yet.</p>
+        )}
       </section>
 
       <section className="panel">
@@ -134,11 +215,7 @@ export function CompanyWorkspace({ companyId }: { companyId: string }) {
               <h3>{date}</h3>
               <div className="stack">
                 {reports.map((report) => (
-                  <Link
-                    key={report.id}
-                    href={`/library/${companyId}/reports/${report.id}`}
-                    className="report-row"
-                  >
+                  <Link key={report.id} href={`/library/${companyId}/reports/${report.id}`} className="report-row">
                     <div>
                       <strong>{report.question}</strong>
                       <p>{report.status}</p>
@@ -150,6 +227,7 @@ export function CompanyWorkspace({ companyId }: { companyId: string }) {
             </div>
           ))}
           {!detail.reports.length && <p className="muted">No saved reports for this company yet.</p>}
+          {error && <p className="error-text">{error}</p>}
         </div>
       </section>
     </>

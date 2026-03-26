@@ -11,12 +11,48 @@
   "technology": {
     "summary": "A full-stack accelerated computing platform built around GPUs, networking, and CUDA software.",
     "world_impact": "The platform can accelerate AI model training, simulation, robotics, and scientific workloads across the economy.",
+    "scientific_mechanism": "NVIDIA's edge comes from pairing high-performance GPU architectures with networking and a sticky CUDA software stack that makes accelerated computing easier to deploy at scale.",
+    "proof_status": "The technology is already proven in production across hyperscalers, enterprises, and research workloads, although the next question is durability rather than viability.",
     "feasibility": "High. The stack is already deployed at scale, although supply chain capacity and power constraints remain meaningful.",
+    "engineering_bottlenecks": ["Advanced packaging availability", "Data-center power constraints", "Execution against custom-silicon alternatives"],
     "requirements": ["Advanced packaging capacity", "Foundry access", "Developer ecosystem", "Large customer capex budgets"],
     "constraints": ["Export controls", "Power consumption", "Hyperscaler custom silicon risk"],
     "competitor_technologies": ["AMD GPU accelerators", "Hyperscaler custom ASICs", "Specialized inference chips"],
     "preferred_technology": "NVIDIA's integrated accelerator platform",
     "preferred_rationale": "The hardware-software ecosystem and installed developer base still provide the strongest edge.",
+    "cost_curve": "The system remains expensive, but buyers still accept the cost if utilization and AI workload demand remain strong enough to justify the spend.",
+    "timeline": "The near-term timeline is more about sustaining product cadence and customer capex than proving the platform can work technically.",
+    "regulatory_path": "The primary external gating item is export policy rather than scientific approval or safety licensing.",
+    "manufacturing_dependencies": ["Foundry capacity", "Advanced packaging", "Networking and memory supply chain resilience"],
+    "capital_intensity": "Moderate for NVIDIA itself but heavy for customers that must fund data-center infrastructure and power.",
+    "failure_modes": [
+      "AI infrastructure demand normalizes faster than expected",
+      "Customers shift enough spend to internal ASICs to pressure the moat",
+      "Supply or policy constraints interrupt the expected product cycle"
+    ],
+    "sources": [
+      {
+        "title": "NVIDIA platform overview",
+        "url": "https://www.nvidia.com",
+        "publisher": "NVIDIA",
+        "published_at": "2026-03-20",
+        "snippet": "Company materials frame NVIDIA as a full-stack accelerated computing platform spanning GPUs, networking, and CUDA software."
+      },
+      {
+        "title": "NVIDIA quote page",
+        "url": "https://finance.yahoo.com/quote/NVDA/",
+        "publisher": "Yahoo Finance",
+        "published_at": "2026-03-20",
+        "snippet": "Yahoo Finance reflected NVIDIA's elevated valuation alongside strong margins and growth."
+      },
+      {
+        "title": "Semiconductor and AI infrastructure commentary",
+        "url": "https://www.marketwatch.com",
+        "publisher": "MarketWatch",
+        "published_at": "2026-03-20",
+        "snippet": "Market commentary highlighted how much of the valuation still rests on durable AI infrastructure demand."
+      }
+    ],
     "open_unknowns": ["How durable hyperscaler AI capex stays through the next downcycle"]
   },
   "stock": {
@@ -54,6 +90,15 @@
     "supplemental_metrics": {
       "backlog_coverage_quarters": 2.1
     },
+    "sources": [
+      {
+        "title": "NVDA stock page",
+        "url": "https://robinhood.com/us/en/stocks/NVDA/",
+        "publisher": "Robinhood",
+        "published_at": "2026-03-20",
+        "snippet": "Robinhood reflected NVIDIA as a heavily followed public equity tied to AI infrastructure demand."
+      }
+    ],
     "commentary": "Exceptional growth and margins, but valuation already discounts a long runway of AI capex strength."
   }
 }
